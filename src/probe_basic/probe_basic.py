@@ -8,7 +8,7 @@ import linuxcnc
 
 from qtpy.QtCore import Slot, QRegExp, Qt
 from qtpy.QtGui import QFontDatabase, QRegExpValidator
-from qtpy.QtWidgets import QAbstractButton
+from qtpy.QtWidgets import QAbstractButton, QApplication
 from qtpy.QtWidgets import QAction, QWidget
 from qtpy import uic
 
@@ -20,6 +20,16 @@ from qtpyvcp.utilities.settings import getSetting, setSetting
 sys.path.insert(0,'/usr/lib/python3/dist-packages/probe_basic')
 import probe_basic_rc
 
+# Import touch theme support
+try:
+    from .touch_utils import create_touch_theme_manager, apply_touch_optimizations
+    from .touch_config import DEFAULT_CONFIG
+    TOUCH_SUPPORT = True
+except ImportError:
+    # Fall back gracefully if touch modules aren't available
+    TOUCH_SUPPORT = False
+    print("Touch theme support not available - falling back to standard themes")
+
 LOG = logger.getLogger('QtPyVCP.' + __name__)
 VCP_DIR = os.path.abspath(os.path.dirname(__file__))
 INIFILE = linuxcnc.ini(os.getenv("INI_FILE_NAME"))
@@ -30,6 +40,12 @@ class ProbeBasic(VCPMainWindow):
     """Main window class for the ProbeBasic VCP."""
     def __init__(self, *args, **kwargs):
         super(ProbeBasic, self).__init__(*args, **kwargs)
+        
+        # Initialize touch theme support if available
+        self.touch_theme_manager = None
+        if TOUCH_SUPPORT:
+            self._init_touch_theme_support()
+        
         self.filesystemtable.sortByColumn(3, Qt.DescendingOrder)
         self.filesystemtable_2.sortByColumn(3, Qt.DescendingOrder)
         self.run_from_line_Num.setValidator(QRegExpValidator(QRegExp("[0-9]*")))
@@ -117,6 +133,71 @@ class ProbeBasic(VCPMainWindow):
             # Set the main tab widget to the correct tab at startup
             self.set_startup_tab_by_text(self.startup_tab_combobox.currentText())
         # --- End Startup Tab Selection Logic ---
+    
+    def _init_touch_theme_support(self):
+        """Initialize touch theme support"""
+        try:
+            self.touch_theme_manager = create_touch_theme_manager(VCP_DIR)
+            
+            # Check for touch theme setting in INI file
+            touch_theme = INIFILE.find("DISPLAY", "TOUCH_THEME")
+            if touch_theme:
+                self.touch_theme_manager.set_theme(touch_theme.strip())
+            
+            # Check for touch optimizations setting
+            touch_optimized = INIFILE.find("DISPLAY", "TOUCH_OPTIMIZED")
+            if touch_optimized and touch_optimized.strip().lower() in ['true', '1', 'yes']:
+                self._apply_touch_optimizations()
+            
+            # Connect theme change signals
+            self.touch_theme_manager.theme_changed.connect(self._on_touch_theme_changed)
+            self.touch_theme_manager.size_class_changed.connect(self._on_size_class_changed)
+            
+        except Exception as e:
+            LOG.warning(f"Failed to initialize touch theme support: {e}")
+            self.touch_theme_manager = None
+    
+    def _apply_touch_optimizations(self):
+        """Apply touch optimizations to the interface"""
+        if not self.touch_theme_manager:
+            return
+        
+        # Apply touch optimizations to main interface elements
+        for widget in self.findChildren(QWidget):
+            try:
+                apply_touch_optimizations(widget, self.touch_theme_manager)
+            except Exception as e:
+                LOG.debug(f"Failed to apply touch optimizations to {widget}: {e}")
+        
+        # Apply the touch theme
+        app = QApplication.instance()
+        if app:
+            self.touch_theme_manager.apply_theme(app)
+    
+    def _on_touch_theme_changed(self, theme_name):
+        """Handle touch theme changes"""
+        LOG.info(f"Touch theme changed to: {theme_name}")
+        app = QApplication.instance()
+        if app and self.touch_theme_manager:
+            self.touch_theme_manager.apply_theme(app)
+    
+    def _on_size_class_changed(self, size_class):
+        """Handle size class changes"""
+        LOG.info(f"Size class changed to: {size_class}")
+        if self.touch_theme_manager:
+            self._apply_touch_optimizations()
+    
+    def get_available_touch_themes(self):
+        """Get list of available touch themes"""
+        if self.touch_theme_manager:
+            return self.touch_theme_manager.get_available_themes()
+        return []
+    
+    def set_touch_theme(self, theme_name):
+        """Set the touch theme"""
+        if self.touch_theme_manager:
+            return self.touch_theme_manager.set_theme(theme_name)
+        return False
 
     def store_original_tooltips(self):
         """Store the original tooltips for all widgets to restore later."""
