@@ -1,0 +1,20 @@
+{
+  "title": "Dashboard Overview",
+  "description": "The main dashboard provides at-a-glance status and control for your CNC machine. Monitor machine status, coordinates, and control program execution.",
+  "usage": "Use the dashboard to:\n• Monitor machine position and status\n• Start, pause, or stop programs\n• Adjust feed and spindle overrides\n• View active modal groups and work coordinate systems\n• Check for alarms and system status",
+  "tips": [
+    "The DRO (Digital Read Out) shows current machine position",
+    "Green indicators mean systems are ready, red indicates issues",
+    "Override controls allow real-time speed adjustments during operation",
+    "Modal groups show active G-code modes (G0/G1, G17-19, G90/91, etc.)",
+    "Work coordinate systems (G54-G59.3) can be quickly selected"
+  ],
+  "safety": [
+    "Always verify machine is homed before starting operations",
+    "Check all safety interlocks before running programs",
+    "Monitor override settings - high values can cause dangerous speeds",
+    "Ensure emergency stop is easily accessible",
+    "Never leave machine unattended during operation"
+  ],
+  "related_docs": "https://probe-basic.readthedocs.io/dashboard"
+}

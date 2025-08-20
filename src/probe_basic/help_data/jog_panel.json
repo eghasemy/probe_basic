@@ -1,0 +1,23 @@
+{
+  "title": "Jogging Controls",
+  "description": "Manual jogging controls for precise machine positioning. Move axes individually using continuous or incremental modes with adjustable speeds.",
+  "usage": "Jogging operations:\n• Select axis to move (X, Y, Z, etc.)\n• Choose jog mode: continuous or incremental\n• Set jog speed using slider or presets\n• Use direction buttons or keyboard arrows\n• For incremental: select step size (0.001\" to 1.0\")\n• Use MPG wheel for fine positioning",
+  "tips": [
+    "Start with slow speeds for precise positioning",
+    "Use incremental mode for exact distances", 
+    "Continuous mode is faster for large movements",
+    "Keyboard shortcuts: arrow keys for X/Y, Page Up/Down for Z",
+    "Hold Shift for faster jog speeds",
+    "MPG wheel provides tactile feedback for fine adjustments"
+  ],
+  "safety": [
+    "Always check for obstructions before jogging",
+    "Start with slow speeds until familiar with machine response",
+    "Keep emergency stop within easy reach",
+    "Be aware of soft and hard limits",
+    "Never jog into fixtures, vises, or tooling",
+    "Ensure machine is homed before jogging to absolute positions",
+    "Watch for cable snags during movement"
+  ],
+  "related_docs": "https://probe-basic.readthedocs.io/jogging"
+}
