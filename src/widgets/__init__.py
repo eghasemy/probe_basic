@@ -187,3 +187,31 @@ class ToolTableEditorPlugin(_DesignerPlugin):
 class FixtureLibraryPlugin(_DesignerPlugin):
     def pluginClass(self):
         return FixtureLibrary
+
+
+# Import Phase 9 widgets
+from widgets.profile_manager.profile_manager import ProfileManager
+from widgets.settings_manager.settings_manager import SettingsManager
+from widgets.network_manager.network_manager import NetworkManager
+from widgets.backup_restore.backup_restore import BackupRestore
+
+
+# Phase 9 Widget Plugins
+class ProfileManagerPlugin(_DesignerPlugin):
+    def pluginClass(self):
+        return ProfileManager
+
+
+class SettingsManagerPlugin(_DesignerPlugin):
+    def pluginClass(self):
+        return SettingsManager
+
+
+class NetworkManagerPlugin(_DesignerPlugin):
+    def pluginClass(self):
+        return NetworkManager
+
+
+class BackupRestorePlugin(_DesignerPlugin):
+    def pluginClass(self):
+        return BackupRestore
