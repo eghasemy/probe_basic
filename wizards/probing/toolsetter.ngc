@@ -1,0 +1,129 @@
+(author: PB-Touch Phase 4)
+(version: 1.0)
+(date: 2024-12-20)
+(description: Tool setter wizard for guided tool length setting)
+
+o<toolsetter> sub
+
+; Parameters from UI
+#<fast_probe_fr> = #3140      (fast probe feed rate)
+#<slow_probe_fr> = #3141      (slow probe feed rate)
+#<traverse_fr> = #3142        (traverse feed rate)
+#<z_max_travel> = #3143       (max Z travel distance)
+#<retract_distance> = #3144   (retract distance after probe)
+#<spindle_zero_height> = #3145 (G53 distance from home to spindle nose at trigger point)
+#<safe_z> = #3146             (safe Z height for moves)
+#<breakage_check> = #3147     (1=enable breakage check, 0=disable)
+#<expected_length> = #3148    (expected tool length for breakage check)
+#<tolerance> = #3149          (tolerance for breakage check)
+
+; Safety checks
+o100 if [#5070 EQ 0]
+    (MSG, Probe not detected - check probe connection)
+    M2
+o100 endif
+
+; Get current tool number
+#<current_tool> = #5400
+
+o110 if [#<current_tool> EQ 0]
+    (MSG, No tool loaded - load a tool first)
+    M2
+o110 endif
+
+; Store current position
+#<start_x> = #5420
+#<start_y> = #5421  
+#<start_z> = #5422
+
+; Get tool setter position (G30)
+#<tool_setter_x> = #5181
+#<tool_setter_y> = #5182
+#<tool_setter_z> = #5183
+
+; Store current tool length offset for comparison
+#<current_offset> = #5422
+
+G90 (absolute mode)
+G49 (cancel tool length compensation temporarily)
+
+; Move to safe Z height
+G53 G1 F[#<traverse_fr>] Z[#<safe_z>]
+
+; Move to tool setter XY position
+G53 G1 F[#<traverse_fr>] X[#<tool_setter_x>] Y[#<tool_setter_y>]
+
+; Move to tool setter Z position  
+G53 G1 F[#<traverse_fr>] Z[#<tool_setter_z>]
+
+; Store Z offset for calculation
+#<offset_z> = #5422
+
+; Fast probe down
+G91 (incremental mode)
+F[#<fast_probe_fr>]
+G38.2 Z-[#<z_max_travel>]
+
+o200 if [#5070 EQ 0]
+    (MSG, Fast probe failed - check tool setter)
+    G90
+    G53 G1 F[#<traverse_fr>] Z[#<safe_z>]
+    M2
+o200 endif
+
+#<z_fast_probe> = #5063
+G1 F[#<traverse_fr>] Z[#<retract_distance>] ; retract
+
+; Slow probe if enabled
+o300 if [#<slow_probe_fr> GT 0]
+    F[#<slow_probe_fr>]
+    G38.2 Z-[#<retract_distance> * 2]
+    
+    o310 if [#5070 EQ 0]
+        (MSG, Slow probe failed)
+        G90
+        G53 G1 F[#<traverse_fr>] Z[#<safe_z>]
+        M2
+    o310 endif
+    
+    #<z_slow_probe> = #5063
+    G90
+    G1 F[#<traverse_fr>] Z[#<z_slow_probe> + #<retract_distance>]
+o300 else
+    #<z_slow_probe> = #<z_fast_probe>
+o300 endif
+
+; Calculate new tool length offset
+#<new_tool_length_offset> = [ABS[#<spindle_zero_height> + #5063 - #<offset_z>]]
+
+; Breakage check if enabled
+o400 if [#<breakage_check> EQ 1 AND #<expected_length> GT 0]
+    #<length_difference> = [ABS[#<new_tool_length_offset> - #<expected_length>]]
+    o410 if [#<length_difference> GT #<tolerance>]
+        (MSG, TOOL BREAKAGE DETECTED! Expected: #<expected_length> Measured: #<new_tool_length_offset>)
+        G53 G1 F[#<traverse_fr>] Z[#<safe_z>]
+        M2
+    o410 endif
+o400 endif
+
+; Move to safe position
+G90
+G53 G1 F[#<traverse_fr>] Z[#<safe_z>]
+
+; Write new tool length to tool table
+G10 L1 P[#<current_tool>] Z[#<new_tool_length_offset>]
+
+; Reload tool with new offset
+T[#<current_tool>] G43 H[#<current_tool>]
+
+; Success message
+(MSG, Tool #<current_tool> length set to #<new_tool_length_offset>)
+
+; Return to starting position if desired
+o500 if [#<start_z> LT [#<safe_z> - 1]] ; Only return if start position was below safe Z
+    G1 F[#<traverse_fr>] X[#<start_x>] Y[#<start_y>]
+    G1 F[#<traverse_fr>] Z[#<start_z>]
+o500 endif
+
+o<toolsetter> endsub
+M2

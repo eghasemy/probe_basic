@@ -1,0 +1,93 @@
+(author: PB-Touch Phase 4)
+(version: 1.0)
+(date: 2024-12-20)
+(description: Z touch-off probing wizard)
+
+o<z_touchoff> sub
+
+; Parameters from UI
+#<probe_dia> = #3130          (probe tip diameter)
+#<approach_feed> = #3131      (approach feed rate)
+#<probe_feed> = #3132         (probe feed rate)
+#<retract> = #3133            (retract distance)
+#<update_wcs> = #3134         (1=update active WCS, 0=position only)
+#<z_offset> = #3135           (Z offset to apply - stock thickness, etc.)
+
+; Safety checks
+o100 if [#5070 EQ 0]
+    (MSG, Probe not detected - check probe connection)
+    M2
+o100 endif
+
+; Store current position
+#<start_x> = #5420
+#<start_y> = #5421  
+#<start_z> = #5422
+
+; Store current WCS
+#<current_wcs> = #5220
+
+G90 (absolute mode)
+G54 (ensure known WCS)
+
+; Fast probe downward
+G91 (incremental mode)
+G38.2 F[#<probe_feed>] Z-50 ; probe down
+
+; Check probe success
+o200 if [#5070 EQ 0]
+    (MSG, Z probe failed to contact surface)
+    G90
+    G1 F[#<approach_feed>] Z#<start_z> ; return to start Z
+    M2
+o200 endif
+
+; Store fast probe result
+#<z_fast> = #5063
+
+; Retract for slow probe
+G1 F[#<approach_feed>] Z[#<retract>]
+
+; Slow probe if different from fast probe
+o300 if [#<probe_feed> GT 10] ; Only do slow probe if fast probe was > 10 units/min
+    ; Calculate slow probe speed (1/4 of fast probe speed)
+    #<slow_probe_feed> = [#<probe_feed> / 4]
+    G38.2 F[#<slow_probe_feed>] Z-[#<retract> * 1.5]
+    
+    o310 if [#5070 EQ 0]
+        (MSG, Slow Z probe failed)
+        G90
+        G1 F[#<approach_feed>] Z#<start_z>
+        M2
+    o310 endif
+    
+    #<z_probe> = #5063
+o300 else
+    #<z_probe> = #<z_fast>
+o300 endif
+
+; Calculate final Z position with offset
+#<z_final> = [#<z_probe> + #<z_offset>]
+
+; Retract safely
+G1 F[#<approach_feed>] Z[#<z_probe> + #<retract>]
+G90 (absolute mode)
+
+; Update WCS if requested
+o400 if [#<update_wcs> EQ 1]
+    ; Set Z zero at the probed surface plus any offset
+    G10 L2 P[#<current_wcs>] Z[#<z_final>]
+    (MSG, WCS Z updated - Surface set as Z reference)
+o400 else
+    (MSG, Z surface found - Position only mode)
+o400 endif
+
+; Display results
+o500 if [#<z_offset> EQ 0]
+    (MSG, Z Surface at: #<z_probe>)
+o500 else
+    (MSG, Z Surface at: #<z_probe> with offset: #<z_offset> = #<z_final>)
+o500 endif
+
+o<z_touchoff> endsub
+M2

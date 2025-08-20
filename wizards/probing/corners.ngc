@@ -1,0 +1,147 @@
+(author: PB-Touch Phase 4)
+(version: 1.0)
+(date: 2024-12-20)
+(description: Corner probing wizard - inside/outside corners)
+
+o<corners> sub
+
+; Parameters from UI
+#<probe_dia> = #3110          (probe tip diameter)
+#<approach_feed> = #3111      (approach feed rate)
+#<probe_feed> = #3112         (probe feed rate)
+#<clearance> = #3113          (clearance distance)
+#<retract> = #3114            (retract distance)
+#<corner_type> = #3115        (0=inside, 1=outside)
+#<corner_pos> = #3116         (0=front-left, 1=front-right, 2=back-left, 3=back-right)
+#<update_wcs> = #3117         (1=update active WCS, 0=position only)
+
+; Safety checks
+o100 if [#5070 EQ 0]
+    (MSG, Probe not detected - check probe connection)
+    M2
+o100 endif
+
+; Store current position
+#<start_x> = #5420
+#<start_y> = #5421  
+#<start_z> = #5422
+
+; Store current WCS
+#<current_wcs> = #5220
+
+; Store probe tip radius
+#<probe_radius> = [#<probe_dia> / 2]
+
+G90 (absolute mode)
+G54 (ensure known WCS)
+
+; Probe first edge (X direction)
+o200 if [#<corner_type> EQ 0] ; Inside corner
+    o210 if [#<corner_pos> EQ 0 OR #<corner_pos> EQ 2] ; Left corners
+        G1 F[#<approach_feed>] X[#<start_x> - #<clearance>]
+        G38.2 F[#<probe_feed>] X[#<start_x> + 50] ; probe X+
+    o210 else ; Right corners
+        G1 F[#<approach_feed>] X[#<start_x> + #<clearance>]
+        G38.2 F[#<probe_feed>] X[#<start_x> - 50] ; probe X-
+    o210 endif
+o200 else ; Outside corner
+    o220 if [#<corner_pos> EQ 0 OR #<corner_pos> EQ 2] ; Left corners
+        G1 F[#<approach_feed>] X[#<start_x> + #<clearance>]
+        G38.2 F[#<probe_feed>] X[#<start_x> - 50] ; probe X-
+    o220 else ; Right corners
+        G1 F[#<approach_feed>] X[#<start_x> - #<clearance>]
+        G38.2 F[#<probe_feed>] X[#<start_x> + 50] ; probe X+
+    o220 endif
+o200 endif
+
+; Check probe success
+o300 if [#5070 EQ 0]
+    (MSG, First probe failed to contact surface)
+    G1 F[#<approach_feed>] X#<start_x> Y#<start_y>
+    M2
+o300 endif
+
+; Store first probe result
+#<probe_x1> = #5061
+#<probe_y1> = #5062
+
+; Return to start position for second probe
+G1 F[#<approach_feed>] X#<start_x>
+
+; Probe second edge (Y direction)
+o400 if [#<corner_type> EQ 0] ; Inside corner
+    o410 if [#<corner_pos> EQ 0 OR #<corner_pos> EQ 1] ; Front corners
+        G1 F[#<approach_feed>] Y[#<start_y> - #<clearance>]
+        G38.2 F[#<probe_feed>] Y[#<start_y> + 50] ; probe Y+
+    o410 else ; Back corners
+        G1 F[#<approach_feed>] Y[#<start_y> + #<clearance>]
+        G38.2 F[#<probe_feed>] Y[#<start_y> - 50] ; probe Y-
+    o410 endif
+o400 else ; Outside corner
+    o420 if [#<corner_pos> EQ 0 OR #<corner_pos> EQ 1] ; Front corners
+        G1 F[#<approach_feed>] Y[#<start_y> + #<clearance>]
+        G38.2 F[#<probe_feed>] Y[#<start_y> - 50] ; probe Y-
+    o420 else ; Back corners
+        G1 F[#<approach_feed>] Y[#<start_y> - #<clearance>]
+        G38.2 F[#<probe_feed>] Y[#<start_y> + 50] ; probe Y+
+    o420 endif
+o400 endif
+
+; Check probe success
+o500 if [#5070 EQ 0]
+    (MSG, Second probe failed to contact surface)
+    G1 F[#<approach_feed>] X#<start_x> Y#<start_y>
+    M2
+o500 endif
+
+; Store second probe result
+#<probe_x2> = #5061
+#<probe_y2> = #5062
+
+; Calculate corner position accounting for probe radius
+o600 if [#<corner_type> EQ 0] ; Inside corner
+    o610 if [#<corner_pos> EQ 0] ; Front-left inside
+        #<corner_x> = [#<probe_x1> + #<probe_radius>]
+        #<corner_y> = [#<probe_y2> + #<probe_radius>]
+    o610 else if [#<corner_pos> EQ 1] ; Front-right inside
+        #<corner_x> = [#<probe_x1> - #<probe_radius>]
+        #<corner_y> = [#<probe_y2> + #<probe_radius>]
+    o610 else if [#<corner_pos> EQ 2] ; Back-left inside
+        #<corner_x> = [#<probe_x1> + #<probe_radius>]
+        #<corner_y> = [#<probe_y2> - #<probe_radius>]
+    o610 else ; Back-right inside
+        #<corner_x> = [#<probe_x1> - #<probe_radius>]
+        #<corner_y> = [#<probe_y2> - #<probe_radius>]
+    o610 endif
+o600 else ; Outside corner
+    o620 if [#<corner_pos> EQ 0] ; Front-left outside
+        #<corner_x> = [#<probe_x1> - #<probe_radius>]
+        #<corner_y> = [#<probe_y2> - #<probe_radius>]
+    o620 else if [#<corner_pos> EQ 1] ; Front-right outside
+        #<corner_x> = [#<probe_x1> + #<probe_radius>]
+        #<corner_y> = [#<probe_y2> - #<probe_radius>]
+    o620 else if [#<corner_pos> EQ 2] ; Back-left outside
+        #<corner_x> = [#<probe_x1> - #<probe_radius>]
+        #<corner_y> = [#<probe_y2> + #<probe_radius>]
+    o620 else ; Back-right outside
+        #<corner_x> = [#<probe_x1> + #<probe_radius>]
+        #<corner_y> = [#<probe_y2> + #<probe_radius>]
+    o620 endif
+o600 endif
+
+; Return to start position
+G1 F[#<approach_feed>] X#<start_x> Y#<start_y>
+
+; Update WCS if requested
+o700 if [#<update_wcs> EQ 1]
+    G10 L2 P[#<current_wcs>] X[#<corner_x>] Y[#<corner_y>]
+    (MSG, WCS updated - Corner position set)
+o700 else
+    (MSG, Corner found - Position only mode)
+o700 endif
+
+; Display results
+(MSG, Corner Position: X#<corner_x> Y#<corner_y>)
+
+o<corners> endsub
+M2

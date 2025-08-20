@@ -1,0 +1,102 @@
+(author: PB-Touch Phase 4)
+(version: 1.0)
+(date: 2024-12-20)
+(description: Edge probing wizard - X/Y single edge probing)
+
+o<edges> sub
+
+; Parameters from UI
+#<probe_dia> = #3100          (probe tip diameter)
+#<approach_feed> = #3101      (approach feed rate)
+#<probe_feed> = #3102         (probe feed rate)
+#<clearance> = #3103          (clearance distance)
+#<retract> = #3104            (retract distance)
+#<direction> = #3105          (0=X+, 1=X-, 2=Y+, 3=Y-)
+#<update_wcs> = #3106         (1=update active WCS, 0=position only)
+
+; Safety checks
+o100 if [#5070 EQ 0]
+    (MSG, Probe not detected - check probe connection)
+    M2
+o100 endif
+
+; Store current position
+#<start_x> = #5420
+#<start_y> = #5421  
+#<start_z> = #5422
+
+; Store current WCS
+#<current_wcs> = #5220
+
+; Store probe tip radius
+#<probe_radius> = [#<probe_dia> / 2]
+
+G90 (absolute mode)
+G54 (ensure known WCS)
+
+; Move to safe approach position based on direction
+o200 if [#<direction> EQ 0] ; X+ direction
+    G1 F[#<approach_feed>] X[#<start_x> + #<clearance>]
+    G38.2 F[#<probe_feed>] X[#<start_x> + 50] ; probe toward X+
+o200 else if [#<direction> EQ 1] ; X- direction  
+    G1 F[#<approach_feed>] X[#<start_x> - #<clearance>]
+    G38.2 F[#<probe_feed>] X[#<start_x> - 50] ; probe toward X-
+o200 else if [#<direction> EQ 2] ; Y+ direction
+    G1 F[#<approach_feed>] Y[#<start_y> + #<clearance>]
+    G38.2 F[#<probe_feed>] Y[#<start_y> + 50] ; probe toward Y+
+o200 else if [#<direction> EQ 3] ; Y- direction
+    G1 F[#<approach_feed>] Y[#<start_y> - #<clearance>]
+    G38.2 F[#<probe_feed>] Y[#<start_y> - 50] ; probe toward Y-
+o200 endif
+
+; Check probe success
+o300 if [#5070 EQ 0]
+    (MSG, Probe failed to contact surface)
+    G1 F[#<approach_feed>] X#<start_x> Y#<start_y> ; return to start
+    M2
+o300 endif
+
+; Store probe result
+#<probe_x> = #5061
+#<probe_y> = #5062
+#<probe_z> = #5063
+
+; Calculate edge position accounting for probe radius
+o400 if [#<direction> EQ 0] ; X+ direction
+    #<edge_x> = [#<probe_x> - #<probe_radius>]
+    #<edge_y> = #<probe_y>
+o400 else if [#<direction> EQ 1] ; X- direction
+    #<edge_x> = [#<probe_x> + #<probe_radius>]
+    #<edge_y> = #<probe_y>
+o400 else if [#<direction> EQ 2] ; Y+ direction
+    #<edge_x> = #<probe_x>
+    #<edge_y> = [#<probe_y> - #<probe_radius>]
+o400 else if [#<direction> EQ 3] ; Y- direction
+    #<edge_x> = #<probe_x>
+    #<edge_y> = [#<probe_y> + #<probe_radius>]
+o400 endif
+
+; Retract safely
+o500 if [#<direction> EQ 0 OR #<direction> EQ 1] ; X direction
+    G1 F[#<approach_feed>] X[#<start_x>]
+o500 else ; Y direction
+    G1 F[#<approach_feed>] Y[#<start_y>]
+o500 endif
+
+; Update WCS if requested
+o600 if [#<update_wcs> EQ 1]
+    o610 if [#<direction> EQ 0 OR #<direction> EQ 1] ; X edge
+        G10 L2 P[#<current_wcs>] X[#<edge_x>]
+    o610 else ; Y edge
+        G10 L2 P[#<current_wcs>] Y[#<edge_y>]
+    o610 endif
+    (MSG, WCS updated - Edge position set)
+o600 else
+    (MSG, Edge found - Position only mode)
+o600 endif
+
+; Display results
+(MSG, Edge Position: X#<edge_x> Y#<edge_y>)
+
+o<edges> endsub
+M2

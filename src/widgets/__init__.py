@@ -22,6 +22,10 @@ from widgets.io_panel.io_panel import IOPanel
 from widgets.jog_panel.jog_panel import JogPanel
 from widgets.diagnostics_panel.diagnostics_panel import DiagnosticsPanel
 
+# Import Phase 4 widgets
+from widgets.probing_wizards.probing_wizards import ProbingWizards
+from widgets.toolsetter_wizard.toolsetter_wizard import ToolsetterWizard
+
 
 
 class LatheToolTouchOff_Plugin(_DesignerPlugin):
@@ -103,3 +107,14 @@ class JogPanelPlugin(_DesignerPlugin):
 class DiagnosticsPanelPlugin(_DesignerPlugin):
     def pluginClass(self):
         return DiagnosticsPanel
+
+
+# Phase 4 Widget Plugins
+class ProbingWizardsPlugin(_DesignerPlugin):
+    def pluginClass(self):
+        return ProbingWizards
+
+
+class ToolsetterWizardPlugin(_DesignerPlugin):
+    def pluginClass(self):
+        return ToolsetterWizard
