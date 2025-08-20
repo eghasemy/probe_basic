@@ -17,6 +17,11 @@ from widgets.cycle_control_panel.cycle_control_panel import CycleControlPanel
 from widgets.alarms_panel.alarms_panel import AlarmsPanel
 from widgets.tool_info_panel.tool_info_panel import ToolInfoPanel
 
+# Import Phase 3 widgets
+from widgets.io_panel.io_panel import IOPanel
+from widgets.jog_panel.jog_panel import JogPanel
+from widgets.diagnostics_panel.diagnostics_panel import DiagnosticsPanel
+
 
 
 class LatheToolTouchOff_Plugin(_DesignerPlugin):
@@ -82,3 +87,19 @@ class AlarmsPanelPlugin(_DesignerPlugin):
 class ToolInfoPanelPlugin(_DesignerPlugin):
     def pluginClass(self):
         return ToolInfoPanel
+
+
+# Phase 3 Widget Plugins
+class IOPanelPlugin(_DesignerPlugin):
+    def pluginClass(self):
+        return IOPanel
+
+
+class JogPanelPlugin(_DesignerPlugin):
+    def pluginClass(self):
+        return JogPanel
+
+
+class DiagnosticsPanelPlugin(_DesignerPlugin):
+    def pluginClass(self):
+        return DiagnosticsPanel
