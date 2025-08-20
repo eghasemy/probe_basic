@@ -10,6 +10,13 @@ from widgets.conversational.hole_circle import HoleCircleWidget
 from widgets.conversational.int_line_edit import IntLineEdit
 from widgets.conversational.float_line_edit import FloatLineEdit
 
+# Import Phase 1 Dashboard widgets
+from widgets.modal_group_hud.modal_group_hud import ModalGroupHUD
+from widgets.status_tiles.status_tiles import StatusTiles
+from widgets.cycle_control_panel.cycle_control_panel import CycleControlPanel
+from widgets.alarms_panel.alarms_panel import AlarmsPanel
+from widgets.tool_info_panel.tool_info_panel import ToolInfoPanel
+
 
 
 class LatheToolTouchOff_Plugin(_DesignerPlugin):
@@ -49,3 +56,29 @@ class XYCoordWidgetPlugin(_DesignerPlugin):
 class FacingWidgetPlugin(_DesignerPlugin):
     def pluginClass(self):
         return FacingWidget
+
+
+# Phase 1 Dashboard Widget Plugins
+class ModalGroupHUDPlugin(_DesignerPlugin):
+    def pluginClass(self):
+        return ModalGroupHUD
+
+
+class StatusTilesPlugin(_DesignerPlugin):
+    def pluginClass(self):
+        return StatusTiles
+
+
+class CycleControlPanelPlugin(_DesignerPlugin):
+    def pluginClass(self):
+        return CycleControlPanel
+
+
+class AlarmsPanelPlugin(_DesignerPlugin):
+    def pluginClass(self):
+        return AlarmsPanel
+
+
+class ToolInfoPanelPlugin(_DesignerPlugin):
+    def pluginClass(self):
+        return ToolInfoPanel

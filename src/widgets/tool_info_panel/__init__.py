@@ -1,0 +1,1 @@
+"""Tool Info Panel Widget for displaying active tool information"""

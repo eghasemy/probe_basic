@@ -1,0 +1,1 @@
+"""Status Tiles Widget for displaying machine status indicators"""
