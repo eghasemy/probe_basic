@@ -1,0 +1,37 @@
+{
+  "format_version": "1.0",
+  "created_time": "2024-12-20T14:30:22.000000",
+  "operation_type": "circular_pocket",
+  "gcode_file": "demo_job2_pocket.ngc",
+  "pb_touch_phase": 6,
+  "parameters": {
+    "common": {
+      "name": "Demo Circular Pocket",
+      "wcs": "G54",
+      "units": "MM",
+      "tool_number": 3,
+      "tool_diameter": 6.0,
+      "spindle_rpm": 2000,
+      "spindle_direction": "CW",
+      "coolant": "FLOOD",
+      "xy_feed_rate": 300.0,
+      "z_feed_rate": 100.0,
+      "clearance_height": 5.0,
+      "retract_height": 2.0,
+      "z_start": 0.0,
+      "z_end": -5.0
+    },
+    "operation": {
+      "center_x": 0.0,
+      "center_y": 0.0,
+      "diameter": 20.0,
+      "step_over": 4.8,
+      "step_down": 1.0
+    }
+  },
+  "template": {
+    "metric": true,
+    "imperial": false
+  },
+  "notes": "Sequential demo job 2 - Circular pocket with spiral roughing strategy"
+}
