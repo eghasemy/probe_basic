@@ -1,0 +1,320 @@
+/* 
+ * PB-Touch Theme - Touch-Optimized Styling for Probe Basic
+ * Phase 0 - Bootstrap & Theming
+ * 
+ * This theme provides touch-friendly interface elements with:
+ * - Minimum 44px touch targets (accessibility standard)
+ * - High contrast colors for industrial environments
+ * - Responsive design for different screen sizes
+ * - Clean, modern visual design
+ */
+
+/* Main Window */
+QMainWindow {
+    background: #1e1e1e;
+    color: #ffffff;
+}
+
+/* Touch-friendly buttons - minimum 44px height */
+QPushButton {
+    color: #ffffff;
+    background: qlineargradient(spread:pad, x1:0, y1:1, x2:0, y2:0, 
+                                stop:0 #3d3d3d, 
+                                stop:0.5 #4a4a4a, 
+                                stop:1 #5a5a5a);
+    border: 2px solid #666666;
+    border-radius: 8px;
+    font-family: "Bebas Kai", sans-serif;
+    font-size: 16pt;
+    font-weight: bold;
+    min-height: 44px;
+    min-width: 44px;
+    padding: 8px 16px;
+    margin: 2px;
+}
+
+QPushButton:hover {
+    background: qlineargradient(spread:pad, x1:0, y1:1, x2:0, y2:0, 
+                                stop:0 #4a4a4a, 
+                                stop:0.5 #5a5a5a, 
+                                stop:1 #6a6a6a);
+    border-color: #888888;
+}
+
+QPushButton:pressed {
+    background: qlineargradient(spread:pad, x1:0, y1:1, x2:0, y2:0, 
+                                stop:0 #2a2a2a, 
+                                stop:0.5 #3a3a3a, 
+                                stop:1 #4a4a4a);
+    border-color: #aaaaaa;
+}
+
+QPushButton:disabled {
+    background: #2a2a2a;
+    border-color: #444444;
+    color: #666666;
+}
+
+/* Emergency/Critical buttons */
+QPushButton[emergency="true"] {
+    background: qlineargradient(spread:pad, x1:0, y1:1, x2:0, y2:0, 
+                                stop:0 #cc2222, 
+                                stop:0.5 #dd3333, 
+                                stop:1 #ee4444);
+    border-color: #ff5555;
+    font-weight: bold;
+}
+
+QPushButton[emergency="true"]:hover {
+    background: qlineargradient(spread:pad, x1:0, y1:1, x2:0, y2:0, 
+                                stop:0 #dd3333, 
+                                stop:0.5 #ee4444, 
+                                stop:1 #ff5555);
+}
+
+/* Primary action buttons */
+QPushButton[primary="true"] {
+    background: qlineargradient(spread:pad, x1:0, y1:1, x2:0, y2:0, 
+                                stop:0 #0066cc, 
+                                stop:0.5 #0077dd, 
+                                stop:1 #0088ee);
+    border-color: #0099ff;
+}
+
+QPushButton[primary="true"]:hover {
+    background: qlineargradient(spread:pad, x1:0, y1:1, x2:0, y2:0, 
+                                stop:0 #0077dd, 
+                                stop:0.5 #0088ee, 
+                                stop:1 #0099ff);
+}
+
+/* Touch-friendly combo boxes */
+QComboBox {
+    color: #ffffff;
+    background: #3d3d3d;
+    border: 2px solid #666666;
+    border-radius: 6px;
+    font-size: 14pt;
+    min-height: 44px;
+    padding: 8px 12px;
+    padding-right: 30px; /* space for drop-down arrow */
+}
+
+QComboBox:hover {
+    border-color: #888888;
+    background: #4a4a4a;
+}
+
+QComboBox::drop-down {
+    width: 30px;
+    border: none;
+    background: transparent;
+}
+
+QComboBox::down-arrow {
+    image: none;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 8px solid #ffffff;
+    margin-right: 8px;
+}
+
+QComboBox QAbstractItemView {
+    background: #3d3d3d;
+    border: 2px solid #666666;
+    border-radius: 4px;
+    color: #ffffff;
+    font-size: 14pt;
+    min-height: 44px;
+}
+
+QComboBox QAbstractItemView::item {
+    min-height: 44px;
+    padding: 8px 12px;
+}
+
+QComboBox QAbstractItemView::item:selected {
+    background: #0077dd;
+}
+
+/* Touch-friendly input fields */
+QLineEdit, QSpinBox, QDoubleSpinBox {
+    background: #2a2a2a;
+    border: 2px solid #666666;
+    border-radius: 6px;
+    color: #ffffff;
+    font-size: 14pt;
+    min-height: 44px;
+    padding: 8px 12px;
+}
+
+QLineEdit:focus, QSpinBox:focus, QDoubleSpinBox:focus {
+    border-color: #0099ff;
+    background: #333333;
+}
+
+/* Touch-friendly sliders */
+QSlider::groove:horizontal {
+    height: 12px;
+    background: #3d3d3d;
+    border: 1px solid #666666;
+    border-radius: 6px;
+}
+
+QSlider::handle:horizontal {
+    background: qlineargradient(spread:pad, x1:0, y1:1, x2:0, y2:0, 
+                                stop:0 #5a5a5a, 
+                                stop:0.5 #6a6a6a, 
+                                stop:1 #7a7a7a);
+    border: 2px solid #888888;
+    width: 44px;
+    height: 44px;
+    border-radius: 22px;
+    margin: -16px 0;
+}
+
+QSlider::handle:horizontal:hover {
+    background: qlineargradient(spread:pad, x1:0, y1:1, x2:0, y2:0, 
+                                stop:0 #6a6a6a, 
+                                stop:0.5 #7a7a7a, 
+                                stop:1 #8a8a8a);
+}
+
+/* Tab widgets - touch friendly */
+QTabWidget::pane {
+    border: 2px solid #666666;
+    border-radius: 8px;
+    background: #2a2a2a;
+}
+
+QTabBar::tab {
+    background: #3d3d3d;
+    border: 2px solid #666666;
+    border-bottom: none;
+    border-radius: 8px 8px 0 0;
+    color: #ffffff;
+    font-size: 14pt;
+    font-weight: bold;
+    min-height: 44px;
+    min-width: 120px;
+    padding: 8px 16px;
+    margin: 2px;
+}
+
+QTabBar::tab:selected {
+    background: #0077dd;
+    border-color: #0099ff;
+}
+
+QTabBar::tab:hover:!selected {
+    background: #4a4a4a;
+    border-color: #888888;
+}
+
+/* Status bar - larger text for better visibility */
+QStatusBar {
+    background: #1e1e1e;
+    border-top: 2px solid #666666;
+    color: #ffffff;
+    font-family: "Bebas Kai", sans-serif;
+    font-size: 14pt;
+    padding: 8px;
+}
+
+/* Scroll bars - touch friendly */
+QScrollBar:vertical {
+    background: #3d3d3d;
+    width: 20px;
+    border-radius: 10px;
+}
+
+QScrollBar::handle:vertical {
+    background: #666666;
+    border-radius: 10px;
+    min-height: 44px;
+}
+
+QScrollBar::handle:vertical:hover {
+    background: #888888;
+}
+
+QScrollBar:horizontal {
+    background: #3d3d3d;
+    height: 20px;
+    border-radius: 10px;
+}
+
+QScrollBar::handle:horizontal {
+    background: #666666;
+    border-radius: 10px;
+    min-width: 44px;
+}
+
+QScrollBar::handle:horizontal:hover {
+    background: #888888;
+}
+
+/* Menu bars - touch friendly */
+QMenuBar {
+    background: #2a2a2a;
+    border-bottom: 2px solid #666666;
+    color: #ffffff;
+    font-size: 14pt;
+}
+
+QMenuBar::item {
+    background: transparent;
+    padding: 8px 16px;
+}
+
+QMenuBar::item:selected {
+    background: #0077dd;
+    border-radius: 4px;
+}
+
+QMenu {
+    background: #3d3d3d;
+    border: 2px solid #666666;
+    border-radius: 6px;
+    color: #ffffff;
+    font-size: 14pt;
+}
+
+QMenu::item {
+    padding: 8px 16px;
+    min-height: 36px;
+}
+
+QMenu::item:selected {
+    background: #0077dd;
+}
+
+/* Tool tips - larger for touch interfaces */
+QToolTip {
+    background: #2a2a2a;
+    border: 2px solid #666666;
+    border-radius: 6px;
+    color: #ffffff;
+    font-size: 13pt;
+    padding: 8px 12px;
+}
+
+/* Group boxes */
+QGroupBox {
+    background: #2a2a2a;
+    border: 2px solid #666666;
+    border-radius: 8px;
+    color: #ffffff;
+    font-size: 14pt;
+    font-weight: bold;
+    margin-top: 20px;
+    padding-top: 12px;
+}
+
+QGroupBox::title {
+    background: #2a2a2a;
+    subcontrol-origin: margin;
+    subcontrol-position: top center;
+    padding: 4px 12px;
+    border-radius: 4px;
+}
