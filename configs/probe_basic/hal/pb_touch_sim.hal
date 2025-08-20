@@ -1,0 +1,35 @@
+# Manual HAL configuration
+# This should be preserved during regeneration
+loadrt threads name1=servo-thread period1=1000000
+
+
+
+
+
+# --- PB-TOUCH GENERATED (do not edit) ---
+# begin: pb_touch_generated
+# Generated at: 2025-08-20 09:02:38
+# Pin mappings: 5 total
+
+# --- COOLANT MAPPINGS ---
+# CoolantMist: Mist coolant control
+net coolant-mist => hm2_7i76e.0.7i76.0.0.output-01
+
+
+# --- INPUT MAPPINGS ---
+# CycleStart: Start program execution button (from acceptance criteria)
+net cycle-start <= hm2_7i76e.0.7i76.0.0.input-00
+
+# FeedHold: Pause program execution button
+net feed-hold <= hm2_7i76e.0.7i76.0.0.input-01
+
+# CycleStop: Stop program execution button
+net cycle-stop <= hm2_7i76e.0.7i76.0.0.input-02
+
+
+# --- SPINDLE MAPPINGS ---
+# SpindleEnable: Enable spindle motor
+net spindle-enable => hm2_7i76e.0.7i76.0.0.output-00
+
+
+# end: pb_touch_generated
