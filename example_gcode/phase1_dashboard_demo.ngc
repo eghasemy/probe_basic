@@ -1,0 +1,79 @@
+; Phase 1 Dashboard Demo Program
+; This G-code demonstrates the Phase 1 Dashboard Parity widgets
+; It shows modal group changes, tool changes, and various machine states
+
+; Start with initialization
+G90 G54 G17 G40 G49 G94 G98 ; Absolute, G54 WCS, XY plane, no compensation, feed rate mode
+G21 ; Metric units (shows units in modal HUD)
+F500 ; Set feed rate
+
+; Display message
+(MSG, Phase 1 Dashboard Demo - Starting)
+
+; Home position
+G0 X0 Y0 Z25
+
+; Tool change to demonstrate tool info panel
+T1 M6 ; Load tool 1
+S1000 M3 ; Start spindle (shows in status tiles)
+
+; Demonstrate modal group changes
+G0 X10 Y10 ; Rapid positioning (G0 in modal HUD)
+G1 Z5 F100 ; Linear interpolation (G1 in modal HUD)
+
+; Change to incremental mode
+G91 ; Incremental positioning (G91 in modal HUD)
+G1 X5 Y5 F200
+
+; Back to absolute
+G90 ; Absolute positioning (G90 in modal HUD)
+
+; Change plane
+G18 ; XZ plane (G18 in modal HUD)
+G0 X20 Z10
+
+G17 ; Back to XY plane (G17 in modal HUD)
+
+; Change coordinate system
+G55 ; Use G55 WCS (G55 in modal HUD)
+G0 X0 Y0
+
+G54 ; Back to G54 WCS (G54 in modal HUD)
+
+; Tool change to demonstrate tool info update
+T2 M6 ; Change to tool 2
+M1 ; Optional stop (test optional stop toggle)
+
+; Cutter compensation demo
+G41 D1 ; Left cutter compensation (G41 in modal HUD)
+G1 X30 Y30 F300
+
+G40 ; Cancel cutter compensation (G40 in modal HUD)
+
+; Tool length compensation
+G43 H1 ; Tool length compensation (G43 in modal HUD)
+G0 Z50
+
+G49 ; Cancel tool length compensation (G49 in modal HUD)
+
+; Change to imperial units
+G20 ; Imperial units (G20 in modal HUD)
+G0 X1.0 Y1.0
+
+G21 ; Back to metric (G21 in modal HUD)
+
+; Spindle off
+M5 ; Stop spindle
+
+; Final position
+G0 X0 Y0 Z25
+
+; Program end
+M30 ; End program
+
+; Notes for testing:
+; - Use Single Block mode to step through and see modal changes
+; - Use Hold/Resume to test cycle control
+; - Tool changes will update the tool info panel
+; - Modal group HUD should update throughout execution
+; - Status tiles should reflect machine state changes

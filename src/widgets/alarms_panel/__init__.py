@@ -1,0 +1,1 @@
+"""Alarms Panel Widget for displaying and managing alarms"""

@@ -1,0 +1,1 @@
+"""Enhanced Cycle Control Panel Widget"""
