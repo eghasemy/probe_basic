@@ -1,0 +1,38 @@
+{
+  "format_version": "1.0",
+  "created_time": "2024-12-20T14:30:22.000000",
+  "operation_type": "facing",
+  "gcode_file": "demo_job1_facing.ngc",
+  "pb_touch_phase": 6,
+  "parameters": {
+    "common": {
+      "name": "Demo Facing Operation",
+      "wcs": "G54",
+      "units": "IN",
+      "tool_number": 1,
+      "tool_diameter": 0.5,
+      "spindle_rpm": 1200,
+      "spindle_direction": "CW",
+      "coolant": "FLOOD",
+      "xy_feed_rate": 50.0,
+      "z_feed_rate": 10.0,
+      "clearance_height": 0.1,
+      "retract_height": 0.1,
+      "z_start": 0.0,
+      "z_end": -0.05
+    },
+    "operation": {
+      "x_start": -1.0,
+      "x_end": 1.0,
+      "y_start": 1.0,
+      "y_end": -1.0,
+      "step_over": 0.4,
+      "step_down": 0.05
+    }
+  },
+  "template": {
+    "metric": false,
+    "imperial": true
+  },
+  "notes": "Sequential demo job 1 - Surface facing operation to prepare workpiece"
+}

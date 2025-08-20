@@ -26,6 +26,11 @@ from widgets.diagnostics_panel.diagnostics_panel import DiagnosticsPanel
 from widgets.probing_wizards.probing_wizards import ProbingWizards
 from widgets.toolsetter_wizard.toolsetter_wizard import ToolsetterWizard
 
+# Import Phase 6 widgets
+from widgets.file_browser.file_browser import FileBrowserWidget
+from widgets.job_manager.job_manager import JobManagerWidget
+from widgets.conversational.conversational_manager import ConversationalManager
+
 
 
 class LatheToolTouchOff_Plugin(_DesignerPlugin):
@@ -118,3 +123,19 @@ class ProbingWizardsPlugin(_DesignerPlugin):
 class ToolsetterWizardPlugin(_DesignerPlugin):
     def pluginClass(self):
         return ToolsetterWizard
+
+
+# Phase 6 Widget Plugins
+class FileBrowserWidgetPlugin(_DesignerPlugin):
+    def pluginClass(self):
+        return FileBrowserWidget
+
+
+class JobManagerWidgetPlugin(_DesignerPlugin):
+    def pluginClass(self):
+        return JobManagerWidget
+
+
+class ConversationalManagerPlugin(_DesignerPlugin):
+    def pluginClass(self):
+        return ConversationalManager

@@ -1,0 +1,39 @@
+{
+  "format_version": "1.0",
+  "created_time": "2024-12-20T14:30:22.000000",
+  "operation_type": "bolt_circle",
+  "gcode_file": "demo_job3_boltcircle.ngc",
+  "pb_touch_phase": 6,
+  "parameters": {
+    "common": {
+      "name": "Demo Bolt Circle",
+      "wcs": "G54",
+      "units": "IN",
+      "tool_number": 2,
+      "tool_diameter": 0.201,
+      "spindle_rpm": 800,
+      "spindle_direction": "CW",
+      "coolant": "FLOOD",
+      "xy_feed_rate": 5.0,
+      "z_feed_rate": 5.0,
+      "clearance_height": 0.1,
+      "retract_height": 0.1,
+      "z_start": 0.0,
+      "z_end": -0.25
+    },
+    "operation": {
+      "center_x": 0.0,
+      "center_y": 0.0,
+      "circle_diameter": 2.0,
+      "hole_diameter": 0.201,
+      "hole_count": 6,
+      "start_angle": 0.0,
+      "step_down": 0.25
+    }
+  },
+  "template": {
+    "metric": false,
+    "imperial": true
+  },
+  "notes": "Sequential demo job 3 - Bolt circle drilling pattern with center hole"
+}
