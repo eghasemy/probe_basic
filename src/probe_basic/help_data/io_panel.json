@@ -1,0 +1,22 @@
+{
+  "title": "IO Panel",
+  "description": "The IO Panel displays real-time input and output states for your machine. Monitor sensors, switches, and control outputs. Force outputs for testing when safe.",
+  "usage": "IO Panel features:\n• View all digital inputs and outputs\n• Filter by input/output type or active state\n• Force outputs ON/OFF for testing\n• Monitor real-time state changes\n• Group related signals for easier viewing",
+  "tips": [
+    "Use filters to focus on specific types of signals",
+    "Green indicators show active/ON state",
+    "Gray indicators show inactive/OFF state", 
+    "Output forcing is only available when machine is ON",
+    "Use descriptive signal names in HAL configuration",
+    "Group related signals with consistent naming"
+  ],
+  "safety": [
+    "Output forcing is disabled during ESTOP",
+    "Only force outputs when machine is in safe state",
+    "Never force safety-related outputs",
+    "Understand the purpose of each output before forcing",
+    "Be prepared to stop operation if unexpected behavior occurs",
+    "Test output forcing only in manual mode"
+  ],
+  "related_docs": "https://probe-basic.readthedocs.io/io-panel"
+}

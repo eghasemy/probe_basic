@@ -1,0 +1,23 @@
+{
+  "title": "Probing Operations",
+  "description": "The probing system allows precise measurement and workpiece setup using a touch probe. Set work coordinate systems, find edges, corners, and centers with high accuracy.",
+  "usage": "Probing workflow:\n• Install and calibrate touch probe\n• Select probing operation (edge, corner, center, etc.)\n• Set probe parameters (feed rate, retract distance)\n• Position probe near feature to measure\n• Run probing cycle\n• Review results and apply to work coordinates",
+  "tips": [
+    "Always calibrate probe tip diameter before use",
+    "Use conservative feed rates for better accuracy",
+    "Ensure probe is properly connected and tested",
+    "Position probe close to but not touching the workpiece",
+    "Verify probe signal polarity is correct",
+    "Use appropriate retract distances for your setup"
+  ],
+  "safety": [
+    "Test probe continuity before each use",
+    "Never probe with spindle running",
+    "Ensure probe cable won't interfere with motion",
+    "Use appropriate feed rates to prevent probe damage",
+    "Always verify probe signal is working before starting",
+    "Keep hands clear of probe and moving axes",
+    "Have emergency stop readily accessible"
+  ],
+  "related_docs": "https://probe-basic.readthedocs.io/probing"
+}

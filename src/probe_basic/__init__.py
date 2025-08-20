@@ -3,6 +3,15 @@ __version__ = get_versions()['version']
 del get_versions
 
 import os
+
+# Initialize logging system early (before qtpyvcp import)
+try:
+    from .logging_config import initialize_logging, get_main_logger
+    initialize_logging()
+except ImportError:
+    # Handle case where logging_config isn't available yet
+    pass
+
 import qtpyvcp
 
 VCP_DIR = os.path.realpath(os.path.dirname(__file__))
