@@ -37,6 +37,11 @@ from widgets.limit_override.limit_override import LimitOverrideDialog, LimitOver
 from widgets.spindle_warmup.spindle_warmup import SpindleWarmupWidget
 from widgets.maintenance_reminders.maintenance_reminders import MaintenanceRemindersWidget
 
+# Import Phase 8 widgets
+from widgets.offsets_editor.offsets_editor import OffsetsEditor
+from widgets.tool_table_editor.tool_table_editor import ToolTableEditor
+from widgets.fixture_library.fixture_library import FixtureLibrary
+
 
 
 class LatheToolTouchOff_Plugin(_DesignerPlugin):
@@ -166,3 +171,19 @@ class SpindleWarmupWidgetPlugin(_DesignerPlugin):
 class MaintenanceRemindersWidgetPlugin(_DesignerPlugin):
     def pluginClass(self):
         return MaintenanceRemindersWidget
+
+
+# Phase 8 Widget Plugins
+class OffsetsEditorPlugin(_DesignerPlugin):
+    def pluginClass(self):
+        return OffsetsEditor
+
+
+class ToolTableEditorPlugin(_DesignerPlugin):
+    def pluginClass(self):
+        return ToolTableEditor
+
+
+class FixtureLibraryPlugin(_DesignerPlugin):
+    def pluginClass(self):
+        return FixtureLibrary

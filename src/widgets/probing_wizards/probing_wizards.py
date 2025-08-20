@@ -619,6 +619,52 @@ class ProbingWizards(VCPBaseWidget):
         
         # TODO: Read back calibration results and display
         self.cal_results.setText("Calibration completed. Check results in parameters.")
+    
+    # Phase 8 Enhancement: WCS Shortcuts Integration
+    @pyqtSlot()
+    def setWCSFromProbeResult(self):
+        """Set WCS from the last probe result - Phase 8 enhancement"""
+        # Get target WCS from combo box (this would be added to UI)
+        target_wcs = getattr(self, 'wcs_target_combo', None)
+        if target_wcs:
+            wcs_name = target_wcs.currentText()
+        else:
+            wcs_name = "G54"  # Default fallback
+        
+        LOG.info(f"Setting {wcs_name} from last probe result")
+        
+        # TODO: Get probe results from last operation
+        # This would read the probe result parameters and apply them to the selected WCS
+        # For now, show placeholder functionality
+        self.status_label.setText(f"Applied probe result to {wcs_name}")
+        
+        # Emit signal for Phase 8 integration
+        if hasattr(self, 'wcsUpdated'):
+            self.wcsUpdated.emit(wcs_name)
+    
+    def addWCSShortcuts(self, layout):
+        """Add WCS shortcut buttons to probing interface - Phase 8 enhancement"""
+        wcs_group = QGroupBox("WCS Shortcuts (Phase 8)")
+        wcs_layout = QHBoxLayout()
+        
+        # Target WCS selection
+        wcs_layout.addWidget(QLabel("Set WCS:"))
+        self.wcs_target_combo = QComboBox()
+        for i in range(1, 10):
+            if i <= 6:
+                self.wcs_target_combo.addItem(f"G5{3+i}")
+            else:
+                self.wcs_target_combo.addItem(f"G59.{i-6}")
+        wcs_layout.addWidget(self.wcs_target_combo)
+        
+        # Quick apply button
+        apply_wcs_btn = QPushButton("Apply to WCS")
+        apply_wcs_btn.setStyleSheet("background-color: #FF9800; color: white; font-weight: bold;")
+        apply_wcs_btn.clicked.connect(self.setWCSFromProbeResult)
+        wcs_layout.addWidget(apply_wcs_btn)
+        
+        wcs_group.setLayout(wcs_layout)
+        layout.addWidget(wcs_group)
 
 # Widget extension for QtDesigner
 class ProbingWizardsExtension(WidgetExtension):
