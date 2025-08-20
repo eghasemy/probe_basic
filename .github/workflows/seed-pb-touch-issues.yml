@@ -4,19 +4,19 @@ on:
   workflow_dispatch:
     inputs:
       epic_title:
-        description: 'Title for the tracking epic'
+        description: Title for the tracking epic
         type: string
-        default: 'Epic: PB-Touch (Probe Basic frontend with Masso G3 Touch features)'
+        default: Epic - PB-Touch (Probe Basic frontend with Masso G3 Touch features)
       milestone:
-        description: 'Milestone to attach to Phase 0–v0.1 scope'
+        description: Milestone to attach to Phase 0–v0.1 scope
         type: string
-        default: 'PB-Touch v0.1'
+        default: PB-Touch v0.1
       label_prefix:
-        description: 'Optional label prefix (e.g., team/component)'
+        description: Optional label prefix (e.g., team/component)
         type: string
-        default: ''
+        default: ""
       dry_run:
-        description: 'If true, do not create or modify issues'
+        description: If true, do not create or modify issues
         type: boolean
         default: false
 
@@ -45,7 +45,7 @@ jobs:
             const owner = context.repo.owner;
             const repo = context.repo.repo;
 
-            function log(msg){ core.info(`ℹ️ ${msg}`); }
+            function log(msg){ core.info(String(msg)); }
 
             // Ensure labels exist
             const baseLabels = [
@@ -66,7 +66,7 @@ jobs:
               try {
                 await github.rest.issues.getLabel({ owner, repo, name });
                 log(`Label exists: ${name}`);
-              } catch {
+              } catch (e) {
                 if (dryRun) { log(`[DRY RUN] Would create label: ${name}`); return; }
                 await github.rest.issues.createLabel({ owner, repo, name, color, description });
                 log(`Created label: ${name}`);
@@ -109,200 +109,197 @@ jobs:
             }
 
             // Prepare labels & milestone
-            for (const l of baseLabels) {
-              await ensureLabel(l);
-            }
+            for (const l of baseLabels) { await ensureLabel(l); }
             const ms = await ensureMilestone(milestoneName);
             const milestoneNumber = ms.number; // may be undefined in dry run
 
             // -------- Issue Specs (Phases) --------
-            // Each body contains a checklist of tasks and acceptance criteria from the PR plan.
             const phases = [
               {
                 title: 'Phase 0 — Bootstrap & Theming',
                 labels: [`${prefix}phase`, `${prefix}ui`],
-                body: `
-**Goal**: Fork Probe Basic baseline; create PB-Touch theme + root screen skeletons.
-
-### Tasks
-- [ ] Add \`/ui/themes/pb-touch.qss\` (flat cards, large tap targets, day/night).
-- [ ] Create screens: \`Home\`, \`Job\`, \`PinMapper\`, \`Probing\`, \`ATC\`, \`Settings\`, \`Diagnostics\`.
-- [ ] Wire nav bar & status ribbon (E-Stop, homed, limits, spindle, overrides).
-
-### Acceptance
-- Launch sim INI → Home loads; E-Stop toggles in sim; feed/spindle override sliders animate.
-
-### Notes
-- Base on Probe Basic/QtPyVCP; style via QSS; actions in \`/config/actions.yaml\`.
-`
+                body: [
+                  '**Goal**: Fork Probe Basic baseline; create PB-Touch theme + root screen skeletons.',
+                  '',
+                  '### Tasks',
+                  '- [ ] Add `/ui/themes/pb-touch.qss` (flat cards, large tap targets, day/night).',
+                  '- [ ] Create screens: `Home`, `Job`, `PinMapper`, `Probing`, `ATC`, `Settings`, `Diagnostics`.',
+                  '- [ ] Wire nav bar & status ribbon (E-Stop, homed, limits, spindle, overrides).',
+                  '',
+                  '### Acceptance',
+                  '- Launch sim INI → Home loads; E-Stop toggles in sim; feed/spindle override sliders animate.',
+                  '',
+                  '### Notes',
+                  '- Base on Probe Basic/QtPyVCP; style via QSS; actions in `/config/actions.yaml`.'
+                ].join('\n')
               },
               {
                 title: 'Phase 1 — Dashboard Parity (Masso Main)',
                 labels: [`${prefix}phase`, `${prefix}ui`],
-                body: `
-**Goal**: Masso-like Main: DRO, mode, cycle controls, overrides, modal groups, WCS, tool preview, alarms.
-
-### Tasks
-- [ ] DRO (metric/imperial), soft zero, WCS (G54–G59.3).
-- [ ] Cycle Start/Hold/Stop; Single Block; Optional Stop.
-- [ ] Feed/Rapid/Spindle overrides (wheels + numeric); modal group display (G0/G1, G17–19, G90/91, etc.).
-- [ ] Alarms panel with acknowledge.
-
-### Acceptance
-- Sim program updates cycle states and displays accurately.
-`
+                body: [
+                  '**Goal**: Masso-like Main: DRO, mode, cycle controls, overrides, modal groups, WCS, tool preview, alarms.',
+                  '',
+                  '### Tasks',
+                  '- [ ] DRO (metric/imperial), soft zero, WCS (G54–G59.3).',
+                  '- [ ] Cycle Start/Hold/Stop; Single Block; Optional Stop.',
+                  '- [ ] Feed/Rapid/Spindle overrides (wheels + numeric); modal group display (G0/G1, G17–19, G90/91, etc.).',
+                  '- [ ] Alarms panel with acknowledge.',
+                  '',
+                  '### Acceptance',
+                  '- Sim program updates cycle states and displays accurately.'
+                ].join('\n')
               },
               {
                 title: 'Phase 2 — Pin Mapper & Machine Config Wizard',
                 labels: [`${prefix}phase`, `${prefix}ui`, `${prefix}hal`],
-                body: `
-**Goal**: Masso-like pin assignment UI and machine config wizard; generate HAL from mappings.
-
-### Tasks
-- [ ] PinMap tree: Function ↔ Signal ↔ Pin (driver.channel).
-- [ ] CRUD mappings in \`/config/pinmap.d/*.yaml\`; "Generate HAL".
-- [ ] Machine Config Wizard: axes, limits, probe, coolant, ATC, spindle type.
-
-### Acceptance
-- Create mapping → Apply → \`/hal/pb_touch_sim.hal\` section regenerates; HAL reloads cleanly in sim.
-`
+                body: [
+                  '**Goal**: Masso-like pin assignment UI and machine config wizard; generate HAL from mappings.',
+                  '',
+                  '### Tasks',
+                  '- [ ] PinMap tree: Function ↔ Signal ↔ Pin (driver.channel).',
+                  '- [ ] CRUD mappings in `/config/pinmap.d/*.yaml`; "Generate HAL".',
+                  '- [ ] Machine Config Wizard: axes, limits, probe, coolant, ATC, spindle type.',
+                  '',
+                  '### Acceptance',
+                  '- Create mapping → Apply → `/hal/pb_touch_sim.hal` section regenerates; HAL reloads cleanly in sim.'
+                ].join('\n')
               },
               {
                 title: 'Phase 3 — IO & Diagnostics, Jogging & MPG',
                 labels: [`${prefix}phase`, `${prefix}ui`, `${prefix}hal`],
-                body: `
-**Goal**: Real-time IO page, diagnostics, jogging panel with on-screen MPG + USB MPG support.
-
-### Tasks
-- [ ] IO view with live states and filters; force outputs only when Machine On.
-- [ ] Jog panel: axis selector, increments, continuous, speed slider; keyboard + on-screen MPG.
-- [ ] MPG device binding: counts-per-detent & axis feed configs.
-
-### Acceptance
-- Sim inputs reflect in UI; MPG mock jogs axes in sim; interlocks respected.
-`
+                body: [
+                  '**Goal**: Real-time IO page, diagnostics, jogging panel with on-screen MPG + USB MPG support.',
+                  '',
+                  '### Tasks',
+                  '- [ ] IO view with live states and filters; force outputs only when Machine On.',
+                  '- [ ] Jog panel: axis selector, increments, continuous, speed slider; keyboard + on-screen MPG.',
+                  '- [ ] MPG device binding: counts-per-detent & axis feed configs.',
+                  '',
+                  '### Acceptance',
+                  '- Sim inputs reflect in UI; MPG mock jogs axes in sim; interlocks respected.'
+                ].join('\n')
               },
               {
                 title: 'Phase 4 — Probing & Tool Setting Wizards',
                 labels: [`${prefix}phase`, `${prefix}wizards`],
-                body: `
-**Goal**: G38.x probing (edges, corners, boss/pocket, center, Z touch-off) + toolsetter workflows.
-
-### Tasks
-- [ ] Unify Probe Basic flows into PB-Touch visuals with safety checklist and dry-run.
-- [ ] Toolsetter wizard (fixed/auto); safe heights; write TL offsets to \`tool.tbl\`.
-- [ ] Probe calibration (tip dia, optional runout comp).
-
-### Acceptance
-- Sim probe triggers update G54; tool table writes persist; offsets reflect in UI.
-`
+                body: [
+                  '**Goal**: G38.x probing (edges, corners, boss/pocket, center, Z touch-off) + toolsetter workflows.',
+                  '',
+                  '### Tasks',
+                  '- [ ] Unify Probe Basic flows into PB-Touch visuals with safety checklist and dry-run.',
+                  '- [ ] Toolsetter wizard (fixed/auto); safe heights; write TL offsets to `tool.tbl`.',
+                  '- [ ] Probe calibration (tip dia, optional runout comp).',
+                  '',
+                  '### Acceptance',
+                  '- Sim probe triggers update G54; tool table writes persist; offsets reflect in UI.'
+                ].join('\n')
               },
               {
                 title: 'Phase 5 — ATC Management',
                 labels: [`${prefix}phase`, `${prefix}atc`, `${prefix}hal`],
-                body: `
-**Goal**: Carousel/linear ATC page, pocket map, M6 remap UI, recovery wizard.
-
-### Tasks
-- [ ] ATC state panel; pocket status; door/air checks.
-- [ ] M6 remap sample (\`remap=M6 ... ngc=atc_change\`).
-- [ ] Recovery: resume mid-change; home ATC.
-
-### Acceptance
-- Sim ATC changes tools on M6; pocket map and pins track state.
-`
+                body: [
+                  '**Goal**: Carousel/linear ATC page, pocket map, M6 remap UI, recovery wizard.',
+                  '',
+                  '### Tasks',
+                  '- [ ] ATC state panel; pocket status; door/air checks.',
+                  '- [ ] M6 remap sample (`remap=M6 ... ngc=atc_change`).',
+                  '- [ ] Recovery: resume mid-change; home ATC.',
+                  '',
+                  '### Acceptance',
+                  '- Sim ATC changes tools on M6; pocket map and pins track state.'
+                ].join('\n')
               },
               {
                 title: 'Phase 6 — Job Manager, File Browser & Conversational',
                 labels: [`${prefix}phase`, `${prefix}jobs`],
-                body: `
-**Goal**: File browser with previews + job queue; conversational ops for common milling.
-
-### Tasks
-- [ ] File browser (local + shares); toolpath preview.
-- [ ] Job queue: enqueue/run/hold/skip; persistent queue.
-- [ ] Conversational: facing, drilling, circles/slots, pockets, bolt circles (emit gcode + JSON sidecar).
-
-### Acceptance
-- Stage 3 demo jobs; run sequentially; conversational gcode executes in sim.
-`
+                body: [
+                  '**Goal**: File browser with previews + job queue; conversational ops for common milling.',
+                  '',
+                  '### Tasks',
+                  '- [ ] File browser (local + shares); toolpath preview.',
+                  '- [ ] Job queue: enqueue/run/hold/skip; persistent queue.',
+                  '- [ ] Conversational: facing, drilling, circles/slots, pockets, bolt circles (emit gcode + JSON sidecar).',
+                  '',
+                  '### Acceptance',
+                  '- Stage 3 demo jobs; run sequentially; conversational gcode executes in sim.'
+                ].join('\n')
               },
               {
                 title: 'Phase 7 — Safety, Homing, Limits, Overrides & Warmup',
                 labels: [`${prefix}phase`, `${prefix}safety`],
-                body: `
-**Goal**: Safety layer (guided homing, soft-limit override), spindle warmup, maintenance timers.
-
-### Tasks
-- [ ] Homing manager; badges per axis.
-- [ ] Timed soft-limit bypass with confirmation.
-- [ ] Spindle warmup program (RPM ladder/duration).
-- [ ] Maintenance reminders (hours), snooze/reset.
-
-### Acceptance
-- Soft-limit in sim prompts override; warmup runs and logs hours.
-`
+                body: [
+                  '**Goal**: Safety layer (guided homing, soft-limit override), spindle warmup, maintenance timers.',
+                  '',
+                  '### Tasks',
+                  '- [ ] Homing manager; badges per axis.',
+                  '- [ ] Timed soft-limit bypass with confirmation.',
+                  '- [ ] Spindle warmup program (RPM ladder/duration).',
+                  '- [ ] Maintenance reminders (hours), snooze/reset.',
+                  '',
+                  '### Acceptance',
+                  '- Soft-limit in sim prompts override; warmup runs and logs hours.'
+                ].join('\n')
               },
               {
                 title: 'Phase 8 — Offsets, Tool Table, Fixture Library',
                 labels: [`${prefix}phase`],
-                body: `
-**Goal**: Full offsets editor, \`tool.tbl\` CRUD, fixture library, WCS shortcuts.
-
-### Tasks
-- [ ] Offsets grid G54–G59.3 + G92; CSV import/export.
-- [ ] Tool table edit with radius/length/notes; bulk ops.
-- [ ] Quick "Set WCS from probe result" actions.
-
-### Acceptance
-- Edits persist; gremlin refreshes; offsets reflect immediately.
-`
+                body: [
+                  '**Goal**: Full offsets editor, `tool.tbl` CRUD, fixture library, WCS shortcuts.',
+                  '',
+                  '### Tasks',
+                  '- [ ] Offsets grid G54–G59.3 + G92; CSV import/export.',
+                  '- [ ] Tool table edit with radius/length/notes; bulk ops.',
+                  '- [ ] Quick "Set WCS from probe result" actions.',
+                  '',
+                  '### Acceptance',
+                  '- Edits persist; gremlin refreshes; offsets reflect immediately.'
+                ].join('\n')
               },
               {
                 title: 'Phase 9 — Settings, Profiles & Network',
                 labels: [`${prefix}phase`, `${prefix}settings`],
-                body: `
-**Goal**: Profiles, units, UI scaling, network share mounts, backup/restore.
-
-### Tasks
-- [ ] Profile create/clone/switch (INI/HAL/YAML bundles).
-- [ ] SMB/NFS mount manager (external scripts).
-- [ ] Backup/restore zip; factory reset for PB-Touch settings.
-
-### Acceptance
-- New profile boots; shares visible in file browser; backups restore correctly.
-`
+                body: [
+                  '**Goal**: Profiles, units, UI scaling, network share mounts, backup/restore.',
+                  '',
+                  '### Tasks',
+                  '- [ ] Profile create/clone/switch (INI/HAL/YAML bundles).',
+                  '- [ ] SMB/NFS mount manager (external scripts).',
+                  '- [ ] Backup/restore zip; factory reset for PB-Touch settings.',
+                  '',
+                  '### Acceptance',
+                  '- New profile boots; shares visible in file browser; backups restore correctly.'
+                ].join('\n')
               },
               {
                 title: 'Phase 10 — Telemetry, Docs & Packaging',
                 labels: [`${prefix}phase`, `${prefix}docs`],
-                body: `
-**Goal**: Structured logging, docs & help overlay, CI, AppImage/Deb packaging.
-
-### Tasks
-- [ ] Python logging per subsystem; rotating files.
-- [ ] /docs with screenshots, quickstart, safety; "?" help overlay.
-- [ ] CI: sim tests + UI smoke (pytest-qt).
-- [ ] AppImage & Debian package; versioning & changelog.
-
-### Acceptance
-- CI green; AppImage launches sim machine; smoke tests pass.
-`
+                body: [
+                  '**Goal**: Structured logging, docs & help overlay, CI, AppImage/Deb packaging.',
+                  '',
+                  '### Tasks',
+                  '- [ ] Python logging per subsystem; rotating files.',
+                  '- [ ] /docs with screenshots, quickstart, safety; "?" help overlay.',
+                  '- [ ] CI: sim tests + UI smoke (pytest-qt).',
+                  '- [ ] AppImage & Debian package; versioning & changelog.',
+                  '',
+                  '### Acceptance',
+                  '- CI green; AppImage launches sim machine; smoke tests pass.'
+                ].join('\n')
               },
               {
                 title: 'Milestone — PB-Touch v0.1 Acceptance',
                 labels: [`${prefix}phase`],
-                body: `
-**Goal**: v0.1 merge criteria.
-
-### Must-Haves
-- Home/Dashboard, Job/File manager, Z probe + corner probing, Offsets/Tool table basics.
-- IO/Diagnostics, E-Stop flow, Settings (profile switch), Safety prompts.
-- Sim machine fully functional; CI build + UI smoke tests; Quick Start docs.
-
-### Exit
-- All checkboxes above completed; blockers triaged for v0.2.
-`
+                body: [
+                  '**Goal**: v0.1 merge criteria.',
+                  '',
+                  '### Must-Haves',
+                  '- Home/Dashboard, Job/File manager, Z probe + corner probing, Offsets/Tool table basics.',
+                  '- IO/Diagnostics, E-Stop flow, Settings (profile switch), Safety prompts.',
+                  '- Sim machine fully functional; CI build + UI smoke tests; Quick Start docs.',
+                  '',
+                  '### Exit',
+                  '- All checkboxes above completed; blockers triaged for v0.2.'
+                ].join('\n')
               }
             ];
 
@@ -311,7 +308,13 @@ jobs:
               title: epicTitle,
               labels: [`${prefix}phase`],
               milestone: milestoneNumber,
-              body: `Tracking epic for PB-Touch phases.\n\n> This issue is auto-managed by the seeding workflow.\n\n_Child issues will be listed here after creation._`
+              body: [
+                'Tracking epic for PB-Touch phases.',
+                '',
+                '> This issue is auto-managed by the seeding workflow.',
+                '',
+                '_Child issues will be listed here after creation_.'
+              ].join('\n')
             });
 
             // Create/ensure phase issues
@@ -319,7 +322,7 @@ jobs:
             for (const spec of phases) {
               const issue = await createOrGetIssue({
                 title: spec.title,
-                body: spec.body.trim(),
+                body: spec.body,
                 labels: spec.labels,
                 milestone: milestoneNumber
               });
@@ -331,16 +334,23 @@ jobs:
               .map(i => `- [ ] ${i.title}${i.number ? ` (#${i.number})` : ''}`)
               .join('\n');
 
-            const epicBody = `Tracking epic for PB-Touch phases.\n\n### Phases\n${checklist}\n\n> Use this epic to coordinate sequencing and verify acceptance criteria per phase.`;
+            const epicBody = [
+              'Tracking epic for PB-Touch phases.',
+              '',
+              '### Phases',
+              checklist,
+              '',
+              '> Use this epic to coordinate sequencing and verify acceptance criteria per phase.'
+            ].join('\n');
 
             if (dryRun) {
-              log(`[DRY RUN] Would update epic issue body:\n${epicBody}`);
+              log('[DRY RUN] Would update epic body');
+              log(epicBody);
             } else {
               await github.rest.issues.update({
-                owner, repo, issue_number: epic.number,
-                body: epicBody
+                owner, repo, issue_number: epic.number, body: epicBody
               });
               log(`Updated epic #${epic.number} with ${created.length} linked phases.`);
             }
 
-            log('✅ Seeding complete.');
+            log('Seeding complete.');
