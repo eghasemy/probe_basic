@@ -1,0 +1,38 @@
+; Spindle Warmup - Quick (2 minutes)
+; Safe and efficient warmup sequence for light operations
+;
+; This program gradually increases spindle speed through predefined steps
+; to ensure proper lubrication and thermal conditioning
+
+O<quick_warmup> sub
+
+(Print warmup start message)
+(MSG, Starting Quick Spindle Warmup - 2 minutes)
+
+; Ensure spindle is stopped and machine is ready
+M5
+G4 P1.0
+
+; Step 1: 500 RPM for 30 seconds
+(MSG, Warmup Step 1: 500 RPM for 30 seconds)
+M3 S500
+G4 P30.0
+
+; Step 2: 1000 RPM for 30 seconds  
+(MSG, Warmup Step 2: 1000 RPM for 30 seconds)
+S1000
+G4 P30.0
+
+; Step 3: 2000 RPM for 60 seconds
+(MSG, Warmup Step 3: 2000 RPM for 60 seconds)
+S2000
+G4 P60.0
+
+; Stop spindle
+M5
+G4 P2.0
+
+(MSG, Quick Warmup Complete - Spindle Ready)
+
+O<quick_warmup> endsub
+M2
