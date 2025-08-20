@@ -18,8 +18,17 @@ import sys
 vcp_dir = os.path.join(os.path.abspath('.'), '..', '..')
 sys.path.insert(0, os.path.abspath(vcp_dir))
 
-import qtpyvcp
-import probe_basic
+try:
+    import qtpyvcp
+    qtpyvcp_available = True
+except ImportError:
+    qtpyvcp_available = False
+
+try:
+    import probe_basic
+    probe_basic_available = True
+except ImportError:
+    probe_basic_available = False
 
 # -- Project information -----------------------------------------------------
 
@@ -28,27 +37,38 @@ copyright = '2021, Chris Polanski'
 author = 'Chris Polanski'
 
 # The short X.Y version.
-qtpyvcp_version = qtpyvcp.__version__.split('+')[0]
-
-# The full version, including alpha/beta/rc tags.
-qtpyvcp_release = qtpyvcp.__version__
-
-# The short commit ID
-qtpyvcp_commit = qtpyvcp.__version__.split('.')[2]
-
+if qtpyvcp_available:
+    qtpyvcp_version = qtpyvcp.__version__.split('+')[0]
+    # The full version, including alpha/beta/rc tags.
+    qtpyvcp_release = qtpyvcp.__version__
+    # The short commit ID
+    qtpyvcp_commit = qtpyvcp.__version__.split('.')[2]
+else:
+    qtpyvcp_version = "Unknown"
+    qtpyvcp_release = "Unknown"
+    qtpyvcp_commit = "Unknown"
 
 # The short X.Y version.
-pb_version = probe_basic.__version__.split('+')[0]
+if probe_basic_available:
+    pb_version = probe_basic.__version__.split('+')[0]
+    # The full version, including alpha/beta/rc tags.
+    pb_release = probe_basic.__version__
+else:
+    pb_version = "Unknown"
+    pb_release = "Unknown"
 
-# The full version, including alpha/beta/rc tags.
-pb_release = probe_basic.__version__
-
-
-with open("/home/buildbot/versions/qtpyvcp_dev_version.txt", "r") as v_file:
-    qtpyvcp_dev_latest_version = v_file.readline().rstrip("\n")
+# Handle version files gracefully
+try:
+    with open("/home/buildbot/versions/qtpyvcp_dev_version.txt", "r") as v_file:
+        qtpyvcp_dev_latest_version = v_file.readline().rstrip("\n")
+except FileNotFoundError:
+    qtpyvcp_dev_latest_version = "Unknown"
     
-with open("/home/buildbot/versions/pb_dev_version.txt", "r") as v_file:
-    probe_basic_dev_latest_version = v_file.readline().rstrip("\n")
+try:
+    with open("/home/buildbot/versions/pb_dev_version.txt", "r") as v_file:
+        pb_dev_latest_version = v_file.readline().rstrip("\n")
+except FileNotFoundError:
+    pb_dev_latest_version = "Unknown"
 
 
 rst_epilog = f"""
@@ -58,10 +78,10 @@ rst_epilog = f"""
 .. |qtpyvcp_arm64_deb| replace:: python3-qtpyvcp_{qtpyvcp_dev_latest_version}.dev_arm64.deb
 .. |qtpyvcp_amd64_deb_link| replace:: https://repository.qtpyvcp.com/repo/qtpyvcp-dev/python3-qtpyvcp_{qtpyvcp_dev_latest_version}.dev_amd64.deb
 .. |qtpyvcp_arm64_deb_link| replace:: https://repository.qtpyvcp.com/repo/qtpyvcp-dev/python3-qtpyvcp_{qtpyvcp_dev_latest_version}.dev_arm.deb
-.. |probe_basic_amd64_deb| replace:: python3-probe-basic_{probe_basic_dev_latest_version}.dev_amd64.deb
-.. |probe_basic_arm64_deb| replace:: python3-probe-basic_{probe_basic_dev_latest_version}.dev_arm64.deb
-.. |probe_basic_amd64_deb_link| replace:: https://repository.qtpyvcp.com/repo/probe-basic-dev/python3-probe-basic_{probe_basic_dev_latest_version}.dev_amd64.deb
-.. |probe_basic_arm64_deb_link| replace:: https://repository.qtpyvcp.com/repo/probe-basic-dev/python3-probe-basic_{probe_basic_dev_latest_version}.dev_arm64.deb
+.. |probe_basic_amd64_deb| replace:: python3-probe-basic_{pb_dev_latest_version}.dev_amd64.deb
+.. |probe_basic_arm64_deb| replace:: python3-probe-basic_{pb_dev_latest_version}.dev_arm64.deb
+.. |probe_basic_amd64_deb_link| replace:: https://repository.qtpyvcp.com/repo/probe-basic-dev/python3-probe-basic_{pb_dev_latest_version}.dev_amd64.deb
+.. |probe_basic_arm64_deb_link| replace:: https://repository.qtpyvcp.com/repo/probe-basic-dev/python3-probe-basic_{pb_dev_latest_version}.dev_arm64.deb
 """
 
 # -- General configuration ---------------------------------------------------
@@ -111,7 +131,7 @@ pygments_style = 'sphinx'
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'sphinx_rtd_theme'
+html_theme = 'alabaster'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -215,4 +235,4 @@ epub_exclude_files = ['search.html']
 # -- Options for intersphinx extension ---------------------------------------
 
 # Example configuration for intersphinx: refer to the Python standard library.
-intersphinx_mapping = {'https://docs.python.org/': None}
+intersphinx_mapping = {'python': ('https://docs.python.org/3', None)}
