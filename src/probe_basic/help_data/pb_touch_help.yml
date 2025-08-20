@@ -1,0 +1,167 @@
+# Help data configuration for PB Touch
+# Links contextual help to comprehensive documentation
+
+help_config:
+  documentation_base_url: "file:///docs/"
+  online_docs_url: "https://eghasemy.github.io/probe_basic/pb_touch_user_guide.html"
+  
+# Widget-specific help data
+widgets:
+  cycle_start:
+    title: "Cycle Start"
+    description: "Begin program execution"
+    usage: "Press to start the loaded G-code program"
+    tips:
+      - "Ensure machine is homed before starting"
+      - "Check tool table is correct"
+      - "Use reduced feed override for new programs"
+    safety:
+      - "Keep hand near Feed Hold button"
+      - "Never leave machine unattended"
+    related_docs: "job_manager.md#program-execution"
+    
+  emergency_stop:
+    title: "Emergency Stop"
+    description: "Immediately stop all machine motion"
+    usage: "Press to immediately stop all machine operations"
+    tips:
+      - "Available on every screen"
+      - "Stops all motion immediately"
+      - "Must be reset before continuing"
+    safety:
+      - "Use whenever safety is in question"
+      - "When in doubt, press ESTOP"
+    related_docs: "safety.md#emergency-stop-procedures"
+    
+  feed_hold:
+    title: "Feed Hold"
+    description: "Pause program execution"
+    usage: "Press to pause current program execution"
+    tips:
+      - "Motion stops at current position"
+      - "Press Cycle Start to resume"
+      - "Spindle continues running"
+    safety:
+      - "Use to pause for inspection"
+      - "Safe way to interrupt cutting"
+    related_docs: "user_interface.md#execution-controls"
+    
+  probe_corner:
+    title: "Corner Probing"
+    description: "Find workpiece corner and set coordinates"
+    usage: "Automatically locate corner of rectangular workpiece"
+    tips:
+      - "Position probe near corner before starting"
+      - "Ensure adequate clearance"
+      - "Check probe signal before operation"
+    safety:
+      - "Test probe signal manually first"
+      - "Verify workpiece is secure"
+      - "Keep hand near feed hold"
+    related_docs: "probing.md#corner-probing"
+    
+  tool_change:
+    title: "Tool Change"
+    description: "Manual or automatic tool change"
+    usage: "Change cutting tool for next operation"
+    tips:
+      - "Stop spindle before tool change"
+      - "Follow ATC sequence for automatic"
+      - "Measure tool length after change"
+    safety:
+      - "Spindle must be stopped"
+      - "Verify tool is properly seated"
+      - "Check tool condition"
+    related_docs: "atc_setup.md#tool-change-sequence"
+
+# Screen-specific help
+screens:
+  home:
+    title: "Home Screen"
+    description: "Main machine control center"
+    usage: "Monitor machine status and control basic functions"
+    sections:
+      - "Machine status indicators"
+      - "Position display (DRO)"
+      - "Manual controls"
+      - "Override controls"
+    related_docs: "user_interface.md#home-screen"
+    
+  job:
+    title: "Job Manager"
+    description: "Program management and execution"
+    usage: "Load, preview, and run G-code programs"
+    sections:
+      - "File browser"
+      - "Program preview"
+      - "Execution controls"
+      - "Progress monitoring"
+    related_docs: "job_manager.md"
+    
+  probing:
+    title: "Probing Operations"
+    description: "Workpiece and tool measurement"
+    usage: "Automated measurement and coordinate setting"
+    sections:
+      - "Probing wizards"
+      - "Probe setup"
+      - "Safety checks"
+      - "Results display"
+    related_docs: "probing.md"
+    
+  atc:
+    title: "Tool Changer"
+    description: "Automatic tool changer control"
+    usage: "Manage tools and automatic tool changes"
+    sections:
+      - "Tool carousel"
+      - "Tool table"
+      - "ATC operations"
+      - "Tool measurement"
+    related_docs: "atc_setup.md"
+    
+  settings:
+    title: "Settings and Configuration"
+    description: "System configuration and preferences"
+    usage: "Configure machine parameters and user preferences"
+    sections:
+      - "Display settings"
+      - "Machine configuration"
+      - "I/O settings"
+      - "Safety settings"
+    related_docs: "settings.md"
+
+# Procedure help
+procedures:
+  machine_setup:
+    title: "Machine Setup Procedure"
+    description: "Complete machine setup workflow"
+    steps:
+      - "Power on and home machine"
+      - "Load and secure workpiece"
+      - "Install and measure tools"
+      - "Set work coordinates"
+      - "Load and verify program"
+    related_docs: "quick_start.md#5-minute-setup"
+    
+  first_job:
+    title: "Running Your First Job"
+    description: "Step-by-step first job procedure"
+    steps:
+      - "Complete machine setup"
+      - "Load G-code program"
+      - "Preview toolpath"
+      - "Set work coordinates with probing"
+      - "Run program with reduced override"
+    related_docs: "quick_start.md#load-your-first-job"
+    
+  probe_setup:
+    title: "Probe Setup Procedure"
+    description: "Setting up touch probe for operation"
+    steps:
+      - "Install probe in spindle"
+      - "Test probe signal"
+      - "Configure probe parameters"
+      - "Verify safety settings"
+      - "Test with known surface"
+    related_docs: "probing.md#probe-setup-in-pb-touch"
