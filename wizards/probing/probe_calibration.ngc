@@ -1,0 +1,157 @@
+(author: PB-Touch Phase 4)
+(version: 1.0)
+(date: 2024-12-20)
+(description: Probe calibration wizard - tip diameter calibration)
+
+o<probe_calibration> sub
+
+; Parameters from UI
+#<known_diameter> = #3150     (known standard diameter for calibration)
+#<approach_feed> = #3151      (approach feed rate)
+#<probe_feed> = #3152         (probe feed rate)
+#<clearance> = #3153          (clearance distance)
+#<retract> = #3154            (retract distance)
+#<calibration_type> = #3155   (0=ring, 1=pin/boss)
+#<current_probe_dia> = #3156  (current probe diameter setting)
+
+; Safety checks
+o100 if [#5070 EQ 0]
+    (MSG, Probe not detected - check probe connection)
+    M2
+o100 endif
+
+o110 if [#<known_diameter> LE 0]
+    (MSG, Invalid calibration standard diameter)
+    M2
+o110 endif
+
+; Store current position
+#<start_x> = #5420
+#<start_y> = #5421  
+#<start_z> = #5422
+
+; Store current probe radius
+#<current_probe_radius> = [#<current_probe_dia> / 2]
+
+G90 (absolute mode)
+G54 (ensure known WCS)
+
+; Calculate probe approach distance based on standard size
+#<approach_distance> = [#<known_diameter> / 2 + #<clearance>]
+
+; Probe X+ direction
+o200 if [#<calibration_type> EQ 0] ; Ring (probe outward)
+    G1 F[#<approach_feed>] X[#<start_x> - #<approach_distance>]
+    G38.2 F[#<probe_feed>] X[#<start_x> + #<approach_distance>]
+o200 else ; Pin/Boss (probe inward)
+    G1 F[#<approach_feed>] X[#<start_x> + #<approach_distance>]
+    G38.2 F[#<probe_feed>] X[#<start_x> - #<approach_distance>]
+o200 endif
+
+o300 if [#5070 EQ 0]
+    (MSG, X+ calibration probe failed)
+    G1 F[#<approach_feed>] X#<start_x> Y#<start_y>
+    M2
+o300 endif
+
+#<x_plus> = #5061
+G1 F[#<approach_feed>] X#<start_x> ; return to center
+
+; Probe X- direction
+o400 if [#<calibration_type> EQ 0] ; Ring (probe outward)
+    G1 F[#<approach_feed>] X[#<start_x> + #<approach_distance>]
+    G38.2 F[#<probe_feed>] X[#<start_x> - #<approach_distance>]
+o400 else ; Pin/Boss (probe inward)
+    G1 F[#<approach_feed>] X[#<start_x> - #<approach_distance>]
+    G38.2 F[#<probe_feed>] X[#<start_x> + #<approach_distance>]
+o400 endif
+
+o500 if [#5070 EQ 0]
+    (MSG, X- calibration probe failed)
+    G1 F[#<approach_feed>] X#<start_x> Y#<start_y>
+    M2
+o500 endif
+
+#<x_minus> = #5061
+G1 F[#<approach_feed>] X#<start_x> ; return to center
+
+; Probe Y+ direction
+o600 if [#<calibration_type> EQ 0] ; Ring (probe outward)
+    G1 F[#<approach_feed>] Y[#<start_y> - #<approach_distance>]
+    G38.2 F[#<probe_feed>] Y[#<start_y> + #<approach_distance>]
+o600 else ; Pin/Boss (probe inward)
+    G1 F[#<approach_feed>] Y[#<start_y> + #<approach_distance>]
+    G38.2 F[#<probe_feed>] Y[#<start_y> - #<approach_distance>]
+o600 endif
+
+o700 if [#5070 EQ 0]
+    (MSG, Y+ calibration probe failed)
+    G1 F[#<approach_feed>] X#<start_x> Y#<start_y>
+    M2
+o700 endif
+
+#<y_plus> = #5062
+G1 F[#<approach_feed>] Y#<start_y> ; return to center
+
+; Probe Y- direction
+o800 if [#<calibration_type> EQ 0] ; Ring (probe outward)
+    G1 F[#<approach_feed>] Y[#<start_y> + #<approach_distance>]
+    G38.2 F[#<probe_feed>] Y[#<start_y> - #<approach_distance>]
+o800 else ; Pin/Boss (probe inward)
+    G1 F[#<approach_feed>] Y[#<start_y> - #<approach_distance>]
+    G38.2 F[#<probe_feed>] Y[#<start_y> + #<approach_distance>]
+o800 endif
+
+o900 if [#5070 EQ 0]
+    (MSG, Y- calibration probe failed)
+    G1 F[#<approach_feed>] X#<start_x> Y#<start_y>
+    M2
+o900 endif
+
+#<y_minus> = #5062
+
+; Calculate measured dimensions
+#<measured_x> = [ABS[#<x_plus> - #<x_minus>]]
+#<measured_y> = [ABS[#<y_plus> - #<y_minus>]]
+
+; Calculate current effective probe diameter
+o1000 if [#<calibration_type> EQ 0] ; Ring calibration
+    #<effective_x_dia> = [#<measured_x> - #<known_diameter>]
+    #<effective_y_dia> = [#<measured_y> - #<known_diameter>]
+o1000 else ; Pin/Boss calibration
+    #<effective_x_dia> = [#<known_diameter> - #<measured_x>]
+    #<effective_y_dia> = [#<known_diameter> - #<measured_y>]
+o1000 endif
+
+; Calculate average effective probe diameter
+#<effective_probe_dia> = [[#<effective_x_dia> + #<effective_y_dia>] / 2]
+
+; Calculate calibration offset (difference from expected)
+#<calibration_offset> = [#<effective_probe_dia> - #<current_probe_dia>]
+
+; Store calibration results in parameters for UI retrieval
+#3160 = #<measured_x>         (measured X dimension)
+#3161 = #<measured_y>         (measured Y dimension)  
+#3162 = #<effective_probe_dia> (calculated effective probe diameter)
+#3163 = #<calibration_offset> (calibration offset to apply)
+#3164 = #<effective_x_dia>    (X direction effective diameter)
+#3165 = #<effective_y_dia>    (Y direction effective diameter)
+
+; Return to start position
+G1 F[#<approach_feed>] X#<start_x> Y#<start_y>
+
+; Display results
+(MSG, Calibration Complete)
+(MSG, Standard: #<known_diameter> Measured X: #<measured_x> Y: #<measured_y>)
+(MSG, Effective Probe Diameter: #<effective_probe_dia>)
+(MSG, Calibration Offset: #<calibration_offset>)
+
+; Check for excessive runout
+#<runout> = [ABS[#<effective_x_dia> - #<effective_y_dia>]]
+o1100 if [#<runout> GT 0.005] ; Flag if runout > 0.005"
+    (MSG, WARNING: Probe runout detected: #<runout>)
+    #3166 = #<runout> ; Store runout value
+o1100 endif
+
+o<probe_calibration> endsub
+M2

@@ -1,0 +1,148 @@
+(author: PB-Touch Phase 4)
+(version: 1.0)
+(date: 2024-12-20)
+(description: Boss and pocket center probing wizard)
+
+o<boss_pocket> sub
+
+; Parameters from UI
+#<probe_dia> = #3120          (probe tip diameter)
+#<approach_feed> = #3121      (approach feed rate)
+#<probe_feed> = #3122         (probe feed rate)
+#<clearance> = #3123          (clearance distance)
+#<retract> = #3124            (retract distance)
+#<feature_type> = #3125       (0=boss, 1=pocket)
+#<approximate_size> = #3126   (approximate feature diameter/width)
+#<update_wcs> = #3127         (1=update active WCS, 0=position only)
+
+; Safety checks
+o100 if [#5070 EQ 0]
+    (MSG, Probe not detected - check probe connection)
+    M2
+o100 endif
+
+; Store current position
+#<start_x> = #5420
+#<start_y> = #5421  
+#<start_z> = #5422
+
+; Store current WCS
+#<current_wcs> = #5220
+
+; Store probe tip radius
+#<probe_radius> = [#<probe_dia> / 2]
+
+G90 (absolute mode)
+G54 (ensure known WCS)
+
+; Calculate probe distances based on approximate size
+#<probe_distance> = [#<approximate_size> / 2 + #<clearance>]
+
+; Probe X+ direction
+o200 if [#<feature_type> EQ 0] ; Boss
+    G1 F[#<approach_feed>] X[#<start_x> + #<probe_distance>]
+    G38.2 F[#<probe_feed>] X[#<start_x> - #<probe_distance>] ; probe toward center
+o200 else ; Pocket
+    G1 F[#<approach_feed>] X[#<start_x> - #<probe_distance>]
+    G38.2 F[#<probe_feed>] X[#<start_x> + #<probe_distance>] ; probe away from center
+o200 endif
+
+o300 if [#5070 EQ 0]
+    (MSG, X+ probe failed)
+    G1 F[#<approach_feed>] X#<start_x> Y#<start_y>
+    M2
+o300 endif
+
+#<x_plus> = #5061
+G1 F[#<approach_feed>] X#<start_x> ; return to center
+
+; Probe X- direction  
+o400 if [#<feature_type> EQ 0] ; Boss
+    G1 F[#<approach_feed>] X[#<start_x> - #<probe_distance>]
+    G38.2 F[#<probe_feed>] X[#<start_x> + #<probe_distance>] ; probe toward center
+o400 else ; Pocket
+    G1 F[#<approach_feed>] X[#<start_x> + #<probe_distance>]
+    G38.2 F[#<probe_feed>] X[#<start_x> - #<probe_distance>] ; probe away from center
+o400 endif
+
+o500 if [#5070 EQ 0]
+    (MSG, X- probe failed)
+    G1 F[#<approach_feed>] X#<start_x> Y#<start_y>
+    M2
+o500 endif
+
+#<x_minus> = #5061
+G1 F[#<approach_feed>] X#<start_x> ; return to center
+
+; Probe Y+ direction
+o600 if [#<feature_type> EQ 0] ; Boss
+    G1 F[#<approach_feed>] Y[#<start_y> + #<probe_distance>]
+    G38.2 F[#<probe_feed>] Y[#<start_y> - #<probe_distance>] ; probe toward center
+o600 else ; Pocket
+    G1 F[#<approach_feed>] Y[#<start_y> - #<probe_distance>]
+    G38.2 F[#<probe_feed>] Y[#<start_y> + #<probe_distance>] ; probe away from center
+o600 endif
+
+o700 if [#5070 EQ 0]
+    (MSG, Y+ probe failed)
+    G1 F[#<approach_feed>] X#<start_x> Y#<start_y>
+    M2
+o700 endif
+
+#<y_plus> = #5062
+G1 F[#<approach_feed>] Y#<start_y> ; return to center
+
+; Probe Y- direction
+o800 if [#<feature_type> EQ 0] ; Boss
+    G1 F[#<approach_feed>] Y[#<start_y> - #<probe_distance>]
+    G38.2 F[#<probe_feed>] Y[#<start_y> + #<probe_distance>] ; probe toward center
+o800 else ; Pocket
+    G1 F[#<approach_feed>] Y[#<start_y> + #<probe_distance>]
+    G38.2 F[#<probe_feed>] Y[#<start_y> - #<probe_distance>] ; probe away from center
+o800 endif
+
+o900 if [#5070 EQ 0]
+    (MSG, Y- probe failed)
+    G1 F[#<approach_feed>] X#<start_x> Y#<start_y>
+    M2
+o900 endif
+
+#<y_minus> = #5062
+
+; Calculate center position
+o1000 if [#<feature_type> EQ 0] ; Boss
+    ; For boss, center is between probe points plus probe radius compensation
+    #<center_x> = [[#<x_plus> + #<x_minus>] / 2]
+    #<center_y> = [[#<y_plus> + #<y_minus>] / 2]
+    ; Calculate actual feature size
+    #<x_size> = [ABS[#<x_plus> - #<x_minus>] + #<probe_dia>]
+    #<y_size> = [ABS[#<y_plus> - #<y_minus>] + #<probe_dia>]
+o1000 else ; Pocket
+    ; For pocket, center is between probe points minus probe radius compensation
+    #<center_x> = [[#<x_plus> + #<x_minus>] / 2]
+    #<center_y> = [[#<y_plus> + #<y_minus>] / 2]
+    ; Calculate actual feature size
+    #<x_size> = [ABS[#<x_plus> - #<x_minus>] - #<probe_dia>]
+    #<y_size> = [ABS[#<y_plus> - #<y_minus>] - #<probe_dia>]
+o1000 endif
+
+; Move to calculated center
+G1 F[#<approach_feed>] X#<center_x> Y#<center_y>
+
+; Update WCS if requested
+o1100 if [#<update_wcs> EQ 1]
+    G10 L2 P[#<current_wcs>] X[#<center_x>] Y[#<center_y>]
+    (MSG, WCS updated - Center position set)
+o1100 else
+    (MSG, Center found - Position only mode)
+o1100 endif
+
+; Display results
+o1200 if [#<feature_type> EQ 0]
+    (MSG, Boss Center: X#<center_x> Y#<center_y> Size: X#<x_size> Y#<y_size>)
+o1200 else
+    (MSG, Pocket Center: X#<center_x> Y#<center_y> Size: X#<x_size> Y#<y_size>)
+o1200 endif
+
+o<boss_pocket> endsub
+M2
