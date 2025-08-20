@@ -1,0 +1,48 @@
+; Spindle Warmup - Standard (5 minutes)
+; Recommended warmup sequence for normal machining operations
+;
+; This program provides comprehensive spindle conditioning through
+; a graduated RPM ladder with appropriate dwell times
+
+O<standard_warmup> sub
+
+(Print warmup start message)
+(MSG, Starting Standard Spindle Warmup - 5 minutes)
+
+; Ensure spindle is stopped and machine is ready
+M5
+G4 P1.0
+
+; Step 1: 300 RPM for 60 seconds - Initial oil circulation
+(MSG, Warmup Step 1: 300 RPM for 60 seconds - Oil circulation)
+M3 S300
+G4 P60.0
+
+; Step 2: 600 RPM for 60 seconds - Bearing warm-up
+(MSG, Warmup Step 2: 600 RPM for 60 seconds - Bearing warm-up)
+S600
+G4 P60.0
+
+; Step 3: 1000 RPM for 60 seconds - Thermal stabilization
+(MSG, Warmup Step 3: 1000 RPM for 60 seconds - Thermal stabilization)
+S1000
+G4 P60.0
+
+; Step 4: 1500 RPM for 60 seconds - Mid-range conditioning
+(MSG, Warmup Step 4: 1500 RPM for 60 seconds - Mid-range conditioning)
+S1500
+G4 P60.0
+
+; Step 5: 2000 RPM for 60 seconds - Final conditioning
+(MSG, Warmup Step 5: 2000 RPM for 60 seconds - Final conditioning)
+S2000
+G4 P60.0
+
+; Stop spindle
+M5
+G4 P2.0
+
+(MSG, Standard Warmup Complete - Spindle Ready for Operation)
+
+O<standard_warmup> endsub
+M2

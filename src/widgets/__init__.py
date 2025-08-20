@@ -31,6 +31,12 @@ from widgets.file_browser.file_browser import FileBrowserWidget
 from widgets.job_manager.job_manager import JobManagerWidget
 from widgets.conversational.conversational_manager import ConversationalManager
 
+# Import Phase 7 widgets
+from widgets.homing_manager.homing_manager import HomingManager
+from widgets.limit_override.limit_override import LimitOverrideDialog, LimitOverrideManager
+from widgets.spindle_warmup.spindle_warmup import SpindleWarmupWidget
+from widgets.maintenance_reminders.maintenance_reminders import MaintenanceRemindersWidget
+
 
 
 class LatheToolTouchOff_Plugin(_DesignerPlugin):
@@ -139,3 +145,24 @@ class JobManagerWidgetPlugin(_DesignerPlugin):
 class ConversationalManagerPlugin(_DesignerPlugin):
     def pluginClass(self):
         return ConversationalManager
+
+
+# Phase 7 Widget Plugins
+class HomingManagerPlugin(_DesignerPlugin):
+    def pluginClass(self):
+        return HomingManager
+
+
+class LimitOverrideManagerPlugin(_DesignerPlugin):
+    def pluginClass(self):
+        return LimitOverrideManager
+
+
+class SpindleWarmupWidgetPlugin(_DesignerPlugin):
+    def pluginClass(self):
+        return SpindleWarmupWidget
+
+
+class MaintenanceRemindersWidgetPlugin(_DesignerPlugin):
+    def pluginClass(self):
+        return MaintenanceRemindersWidget

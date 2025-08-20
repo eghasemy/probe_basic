@@ -1,0 +1,53 @@
+; Spindle Warmup - Thorough (10 minutes)
+; Complete warmup sequence for precision work and high-speed operations
+;
+; This extended program ensures optimal spindle condition for demanding
+; machining operations requiring maximum precision and stability
+
+O<thorough_warmup> sub
+
+(Print warmup start message)
+(MSG, Starting Thorough Spindle Warmup - 10 minutes)
+
+; Ensure spindle is stopped and machine is ready
+M5
+G4 P1.0
+
+; Step 1: 200 RPM for 120 seconds - Gentle start, oil circulation
+(MSG, Warmup Step 1: 200 RPM for 120 seconds - Gentle oil circulation)
+M3 S200
+G4 P120.0
+
+; Step 2: 500 RPM for 120 seconds - Bearing lubrication
+(MSG, Warmup Step 2: 500 RPM for 120 seconds - Bearing lubrication)
+S500
+G4 P120.0
+
+; Step 3: 800 RPM for 120 seconds - Thermal expansion
+(MSG, Warmup Step 3: 800 RPM for 120 seconds - Thermal expansion)
+S800
+G4 P120.0
+
+; Step 4: 1200 RPM for 120 seconds - Mid-range stabilization
+(MSG, Warmup Step 4: 1200 RPM for 120 seconds - Mid-range stabilization)
+S1200
+G4 P120.0
+
+; Step 5: 1800 RPM for 120 seconds - Final thermal conditioning
+(MSG, Warmup Step 5: 1800 RPM for 120 seconds - Final conditioning)
+S1800
+G4 P120.0
+
+; Cool-down step: Return to 1000 RPM for 30 seconds
+(MSG, Cool-down: 1000 RPM for 30 seconds)
+S1000
+G4 P30.0
+
+; Stop spindle
+M5
+G4 P3.0
+
+(MSG, Thorough Warmup Complete - Spindle Optimally Conditioned)
+
+O<thorough_warmup> endsub
+M2
