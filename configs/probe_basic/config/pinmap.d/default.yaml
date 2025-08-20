@@ -1,0 +1,38 @@
+version: '1.0'
+generated_by: PB-Touch Pin Mapper
+mappings:
+  CycleStart:
+    signal: cycle-start
+    pin: hm2_7i76e.0.7i76.0.0.input-00
+    subsystem: input
+    pin_type: bit
+    direction: input
+    notes: Start program execution button
+  FeedHold:
+    signal: feed-hold
+    pin: hm2_7i76e.0.7i76.0.0.input-01
+    subsystem: input
+    pin_type: bit
+    direction: input
+    notes: Pause program execution button
+  CycleStop:
+    signal: cycle-stop
+    pin: hm2_7i76e.0.7i76.0.0.input-02
+    subsystem: input
+    pin_type: bit
+    direction: input
+    notes: Stop program execution button
+  SpindleEnable:
+    signal: spindle-enable
+    pin: hm2_7i76e.0.7i76.0.0.output-00
+    subsystem: spindle
+    pin_type: bit
+    direction: output
+    notes: Enable spindle motor
+  CoolantMist:
+    signal: coolant-mist
+    pin: hm2_7i76e.0.7i76.0.0.output-01
+    subsystem: coolant
+    pin_type: bit
+    direction: output
+    notes: Mist coolant control
