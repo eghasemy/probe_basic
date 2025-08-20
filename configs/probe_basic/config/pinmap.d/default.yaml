@@ -7,7 +7,7 @@ mappings:
     subsystem: input
     pin_type: bit
     direction: input
-    notes: Start program execution button
+    notes: Start program execution button (from acceptance criteria)
   FeedHold:
     signal: feed-hold
     pin: hm2_7i76e.0.7i76.0.0.input-01
