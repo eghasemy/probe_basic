@@ -46,6 +46,12 @@ for the `LinuxCNC <http://linuxcnc.org/>`_ machine control.
 
 .. toctree::
    :maxdepth: 2
+   :caption: PB Touch User Guide:
+
+   pb_touch_user_guide
+
+.. toctree::
+   :maxdepth: 2
    :caption: Extending:
 
    user_tabs
