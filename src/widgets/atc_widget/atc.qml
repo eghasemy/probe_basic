@@ -48,6 +48,7 @@ Rectangle {
 
                 property string pocket_num: index+1
                 property var anim: pocket_anim
+                property bool fault_state: false
 
                 Rectangle {
                     id: pocket_rectangle
@@ -55,12 +56,13 @@ Rectangle {
                     height: pocket_diam
                     width: pocket_diam
 //                    radius: tool_diam/2
-                    color: "white"
+                    color: fault_state ? "red" : "white"
 //                    border.color: "black"
                     anchors.horizontalCenter: parent.horizontalCenter
                     anchors.top: parent.top
                     anchors.topMargin: pocket_position
-                    border.width: 0
+                    border.width: fault_state ? 2 : 0
+                    border.color: "darkred"
                     rotation: 360/pocket_slots * index + 90
 
 
@@ -72,6 +74,7 @@ Rectangle {
                         verticalAlignment: Text.AlignVCenter
                         horizontalAlignment: Text.AlignHCenter
                         font.pixelSize: 24
+                        color: fault_state ? "white" : "black"
                         x: parent.width / 2 - width / 2
                         y: parent.height / 2 - height / 2
                     }
@@ -339,6 +342,175 @@ Rectangle {
 
         function onHomeMsgSig(message) {
             msg_text.text = message;
+        }
+        
+        // Phase 5 - ATC State Management handlers
+        function onAtcStateSig(state) {
+            atc_state_text.text = state;
+            if (state == "Ready") {
+                atc_state_indicator.color = "green";
+            } else if (state == "Busy") {
+                atc_state_indicator.color = "yellow";
+            } else if (state == "Fault") {
+                atc_state_indicator.color = "red";
+            }
+        }
+        
+        function onPocketStateSig(pocket, state) {
+            // Update pocket state visualization
+            if (pocket_slot.itemAt(pocket - 1)) {
+                if (state == "fault") {
+                    pocket_slot.itemAt(pocket - 1).fault_state = true;
+                } else {
+                    pocket_slot.itemAt(pocket - 1).fault_state = false;
+                }
+            }
+        }
+        
+        function onInterlockSig(door_closed, air_pressure, encoder_ready) {
+            door_indicator.color = door_closed ? "green" : "red";
+            air_indicator.color = air_pressure ? "green" : "red";
+            encoder_indicator.color = encoder_ready ? "green" : "red";
+        }
+        
+        function onProgressSig(step_description, progress_percent) {
+            progress_text.text = step_description;
+            progress_bar.value = progress_percent;
+        }
+    }
+    
+    // Phase 5 - ATC State Panel
+    Rectangle {
+        id: state_panel
+        width: parent.width
+        height: 60
+        anchors.bottom: parent.bottom
+        color: "black"
+        border.color: "gray"
+        border.width: 1
+        
+        Row {
+            anchors.left: parent.left
+            anchors.leftMargin: 10
+            anchors.verticalCenter: parent.verticalCenter
+            spacing: 15
+            
+            // ATC State
+            Row {
+                spacing: 5
+                Rectangle {
+                    id: atc_state_indicator
+                    width: 12
+                    height: 12
+                    radius: 6
+                    color: "green"
+                    anchors.verticalCenter: parent.verticalCenter
+                }
+                Text {
+                    id: atc_state_text
+                    text: "Ready"
+                    color: "white"
+                    font.pixelSize: 12
+                    anchors.verticalCenter: parent.verticalCenter
+                }
+            }
+            
+            // Interlocks
+            Text {
+                text: "Interlocks:"
+                color: "white"
+                font.pixelSize: 12
+                anchors.verticalCenter: parent.verticalCenter
+            }
+            
+            Row {
+                spacing: 5
+                Rectangle {
+                    id: door_indicator
+                    width: 10
+                    height: 10
+                    radius: 5
+                    color: "green"
+                    anchors.verticalCenter: parent.verticalCenter
+                }
+                Text {
+                    text: "Door"
+                    color: "white"
+                    font.pixelSize: 10
+                    anchors.verticalCenter: parent.verticalCenter
+                }
+            }
+            
+            Row {
+                spacing: 5
+                Rectangle {
+                    id: air_indicator
+                    width: 10
+                    height: 10
+                    radius: 5
+                    color: "green"
+                    anchors.verticalCenter: parent.verticalCenter
+                }
+                Text {
+                    text: "Air"
+                    color: "white"
+                    font.pixelSize: 10
+                    anchors.verticalCenter: parent.verticalCenter
+                }
+            }
+            
+            Row {
+                spacing: 5
+                Rectangle {
+                    id: encoder_indicator
+                    width: 10
+                    height: 10
+                    radius: 5
+                    color: "green"
+                    anchors.verticalCenter: parent.verticalCenter
+                }
+                Text {
+                    text: "Encoder"
+                    color: "white"
+                    font.pixelSize: 10
+                    anchors.verticalCenter: parent.verticalCenter
+                }
+            }
+        }
+        
+        // Progress display
+        Column {
+            anchors.right: parent.right
+            anchors.rightMargin: 10
+            anchors.verticalCenter: parent.verticalCenter
+            
+            Text {
+                id: progress_text
+                text: ""
+                color: "white"
+                font.pixelSize: 10
+                horizontalAlignment: Text.AlignRight
+            }
+            
+            Rectangle {
+                id: progress_bar_bg
+                width: 100
+                height: 8
+                color: "darkgray"
+                border.color: "gray"
+                border.width: 1
+                visible: progress_text.text !== ""
+                
+                Rectangle {
+                    id: progress_bar
+                    height: parent.height - 2
+                    width: parent.width * (value / 100)
+                    y: 1
+                    x: 1
+                    color: "lightblue"
+                    property real value: 0
+                }
+            }
         }
     }
 }

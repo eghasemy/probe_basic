@@ -1,0 +1,76 @@
+(author: Phase 5 Implementation)
+(version: 1.0)
+(date: Phase 5 ATC Management)
+
+o<atc_change> sub
+
+; Phase 5 - Sample M6 remap with UI progress tracking
+; This is the sample implementation referenced in the issue:
+; remap=M6 ... ngc=atc_change
+
+; Update ATC state to Busy
+(DEBUG, EVAL[vcp.getWidget{"dynatc"}.set_atc_state{"Busy"}])
+(DEBUG, EVAL[vcp.getWidget{"dynatc"}.set_progress{"Starting tool change...", 10}])
+
+; Check interlocks first
+(DEBUG, EVAL[vcp.getWidget{"dynatc"}.set_progress{"Checking interlocks...", 20}])
+
+; Simulate interlock checks (in real implementation, read actual sensors)
+#<door_ok> = 1
+#<air_ok> = 1
+#<encoder_ok> = 1
+
+o100 if [#<door_ok> EQ 0]
+    (DEBUG, EVAL[vcp.getWidget{"dynatc"}.set_atc_state{"Fault"}])
+    (abort, Door not closed)
+o100 endif
+
+o110 if [#<air_ok> EQ 0]
+    (DEBUG, EVAL[vcp.getWidget{"dynatc"}.set_atc_state{"Fault"}])
+    (abort, Air pressure low)
+o110 endif
+
+; Call the main toolchange routine with progress updates
+(DEBUG, EVAL[vcp.getWidget{"dynatc"}.set_progress{"Moving to safe height...", 30}])
+
+; Move to safe Z
+G90
+G0 G53 Z0.0
+
+(DEBUG, EVAL[vcp.getWidget{"dynatc"}.set_progress{"Positioning ATC...", 50}])
+
+; Check if tool change is needed
+o120 if [#<selected_tool> EQ #<tool_in_spindle>]
+    (DEBUG, EVAL[vcp.getWidget{"dynatc"}.set_progress{"Tool already in spindle", 100}])
+    (DEBUG, EVAL[vcp.getWidget{"dynatc"}.set_atc_state{"Ready"}])
+    o<atc_change> return [1]
+o120 endif
+
+; Put away current tool if any
+o130 if [#<tool_in_spindle> GT 0]
+    (DEBUG, EVAL[vcp.getWidget{"dynatc"}.set_progress{"Storing current tool...", 60}])
+    ; Find empty pocket for current tool
+    ; (Implementation would go here)
+o130 endif
+
+; Get new tool
+o140 if [#<selected_tool> GT 0]
+    (DEBUG, EVAL[vcp.getWidget{"dynatc"}.set_progress{"Retrieving new tool...", 80}])
+    ; Find pocket with requested tool
+    ; (Implementation would go here)
+o140 endif
+
+; Complete tool change
+(DEBUG, EVAL[vcp.getWidget{"dynatc"}.set_progress{"Completing tool change...", 95}])
+M61 Q#<selected_tool>
+G43 H#<selected_tool>
+
+; Finished
+(DEBUG, EVAL[vcp.getWidget{"dynatc"}.set_progress{"Tool change complete", 100}])
+(DEBUG, EVAL[vcp.getWidget{"dynatc"}.set_atc_state{"Ready"}])
+
+(PRINT, atc_change: Tool change complete, T#<selected_tool> in spindle)
+
+o<atc_change> endsub [1]
+
+M2
